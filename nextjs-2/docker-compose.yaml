@@ -1,0 +1,21 @@
+services:
+  nextjs:
+    build: .
+    restart: always
+    volumes:
+      - .:/home/node/app
+    environment:
+      - DJANGO_API_URL=http://host.docker.internal:8000/api
+    ports:
+      - 3000:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: >
+      bash -c "
+        if [ ! -d node_modules ]; then
+          echo '📦 node_modules não encontrado, instalando dependências...';
+          npm install;
+        fi;
+        echo '🚀 Iniciando Next.js com npm run dev';
+        npm run dev
+      "

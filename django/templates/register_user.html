@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ETHOS | Criar Conta</title>
+    <link rel="stylesheet" href="{% static 'css/admin/login.css' %}" />
+  </head>
+
+  <body>
+    <section class="content">
+      <div class="welcome-box">
+        <div class="welcome-box-content">
+          <h1 class="title">Criar Conta</h1>
+          <h2 class="title-home">ETHOS</h2>
+
+          <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                  <p class="errornote">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="form-group">
+              <label for="{{ form.username.id_for_label }}">Usuário</label>
+              {{ form.username }}
+              {% for error in form.username.errors %}
+                <div class="errornote">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.email.id_for_label }}">Email</label>
+              {{ form.email }}
+              {% for error in form.email.errors %}
+                <div class="errornote">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.password1.id_for_label }}">Senha</label>
+              {{ form.password1 }}
+              {% for error in form.password1.errors %}
+                <div class="errornote">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.password2.id_for_label }}">Confirme a senha</label>
+              {{ form.password2 }}
+              {% for error in form.password2.errors %}
+                <div class="errornote">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <button type="submit" class="enter-btn">Cadastrar</button>
+          </form>
+
+          <p>
+            <strong>Já tem uma conta?</strong><br />
+            <a href="/login/" class="site-register-btn">FAÇA LOGIN</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="presentation">
+        <h2>Ethos</h2>
+        <p>cursos integrados</p>
+        <h3>Apresenta</h3>
+        <div class="cpac">
+          <span>C</span><span>P</span><span>A</span><span>C</span>
+        </div>
+        <p>CURSO DE PSICANÁLISE E ANÁLISES CLÍNICA</p>
+        <div class="blockquote">
+          <blockquote>
+            <span>Velhos universos,</span>
+            <span>novas dimensões</span>
+          </blockquote>
+        </div>
+        <div class="overlay"></div>
+      </div>
+
+      <div class="presenterImage"></div>
+      <div class="background-image"></div>
+    </section>
+  </body>
+</html>

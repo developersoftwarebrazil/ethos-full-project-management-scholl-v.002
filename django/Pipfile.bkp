@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pillow = "10.4.0"
+psycopg2-binary = "2.9.9"
+dj-database-url = "2.3.0"
+django = "*"
+djangorestframework = "*"
+django-extensions = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"

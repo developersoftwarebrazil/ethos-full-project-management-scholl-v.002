@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ETHOS | Login</title>
+    <link rel="stylesheet" href="{% static 'css/admin/login.css' %}" />
+  </head>
+
+  <body>
+    <section class="content">
+      <!-- Lado esquerdo: formulário de login -->
+      <div class="welcome-box">
+        <div class="welcome-box-content">
+          <h1 class="title">Login</h1>
+          <h2 class="title-home">ETHOS</h2>
+
+          <!-- Formulário de login com validações Django -->
+          <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+              <div class="form-errors">
+                {% for error in form.non_field_errors %}
+                  <p class="errornote">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="form-group">
+              <label for="{{ form.username.id_for_label }}">Usuário</label>
+              {{ form.username }}
+              {% for error in form.username.errors %}
+                <div class="errornote">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="form-group">
+              <label for="{{ form.password.id_for_label }}">Senha</label>
+              {{ form.password }}
+              {% for error in form.password.errors %}
+                <div class="errornote">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            {% if next %}
+              <input type="hidden" name="next" value="{{ next }}" />
+            {% endif %}
+
+            <button type="submit" class="enter-btn">Entrar</button>
+          </form>
+
+          {% url 'admin_password_reset' as password_reset_url %}
+          {% if password_reset_url %}
+            <div class="password-reset-link">
+              <a href="{{ password_reset_url }}">Esqueceu sua senha?</a>
+            </div>
+          {% endif %}
+
+          <p>
+            <strong>Cadastre-se</strong><br />
+            Ainda não possui uma conta? <br />Cadastre-se no site.
+          </p>
+
+          <a href="/register/" class="site-register-btn">CADASTRE-SE NO SITE</a>
+        </div>
+      </div>
+
+      <!-- Lado direito: apresentação -->
+      <div class="presentation">
+        <h2>Ethos</h2>
+        <p>cursos integrados</p>
+        <h3>Apresenta</h3>
+        <div class="cpac">
+          <span>C</span><span>P</span><span>A</span><span>C</span>
+        </div>
+        <p>CURSO DE PSICANÁLISE E ANÁLISES CLÍNICA</p>
+        <div class="blockquote">
+          <blockquote>
+            <span>Velhos universos,</span>
+            <span>novas dimensões</span>
+          </blockquote>
+        </div>
+        <div class="overlay"></div>
+      </div>
+
+      <div class="presenterImage"></div>
+      <div class="background-image"></div>
+    </section>
+  </body>
+</html>

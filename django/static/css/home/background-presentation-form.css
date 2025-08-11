@@ -1,0 +1,205 @@
+@import url("https://fonts.googleapis.com/css2?family=Chathura:wght@400;700&family=Inter:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;700&display=swap");
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.title-home {
+  font-family: "Chathura", cursive;
+  font-weight: 400;
+  font-size: 6rem;
+  line-height: 6rem;
+  letter-spacing: 0.2rem;
+  text-align: center;
+
+  color: #fcffff;
+  margin: 1rem 0;
+}
+h3 {
+  font-family: "Inter", sans-serif;
+  text-align: center;
+  font-size: 1.5rem;
+  color: #fcffff;
+  margin: 0.5rem 0;
+}
+p {
+  font-family: "Inter", sans-serif;
+  text-align: center;
+  font-size: 1rem;
+  color: #fcffff;
+  margin: 0.5rem 0;
+}
+.content {
+  margin: 0;
+  padding: 0;
+  flex: 2;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: "Open Sans", "Chathura", "Inter", "Roboto", sans-serif;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("/static/assets/imgs/foto-estante-livros.jpg") no-repeat
+    center center;
+  background-size: cover;
+  box-sizing: border-box;
+  z-index: -1;
+}
+.presenterImage {
+  position: absolute;
+  right: -10rem;
+  bottom: 0;
+  height: 80%;
+  min-width: 80%;
+  background: url("/static/assets/imgs/foto-apresentador.png") no-repeat bottom
+    right;
+  background-size: contain;
+  opacity: 1;
+  z-index: 2;
+}
+
+.presentation {
+  position: relative;
+  z-index: 5;
+  /* min-height: 100vh; */
+  width: 100%;
+  color: #000003;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.presentation h2 {
+  font-family: "Chathura", cursive;
+  text-transform: uppercase;
+  font-size: 5rem;
+  letter-spacing: 2rem;
+  color: #000003;
+}
+
+.presentation h3 {
+  font-size: 2rem;
+  color: #000003;
+}
+
+.presentation p {
+  font-size: 1.25rem;
+  color: #003366;
+  text-transform: uppercase;
+  margin: 0.5rem 0;
+}
+
+.cpac {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.cpac span {
+  font-family: "Chathura", cursive;
+  font-size: 5rem;
+  font-weight: 400;
+  background-color: #003366;
+  color: #fcffff;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  border: 1px solid #fb1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+  z-index: 1000;
+}
+
+.blockquote {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.blockquote blockquote {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  text-align: center;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 2;
+  color: #011f53;
+  position: relative;
+  max-width: 300px;
+}
+
+.blockquote blockquote span {
+  display: block;
+  line-height: 1.5;
+}
+
+.welcome-box {
+  position: relative;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  margin: 0; /* Remover centralização */
+}
+
+.welcome-box-content {
+  padding: 0 1.5rem;
+  background-color: #003366;
+  border: 4px solid #fb1;
+  border-radius: 0 20%;
+  color: #fff;
+  text-align: left;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-box h3 {
+  font-size: 1.5rem;
+  /* margin-bottom: 0.5rem; */
+  color: #fff;
+}
+
+.welcome-box p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #fcffff;
+}
+
+.admin-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #fb1;
+  color: green;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  width: fit-content;
+}
+
+.admin-btn:hover {
+  background-color: #e0a800;
+  color: #fff;
+}
