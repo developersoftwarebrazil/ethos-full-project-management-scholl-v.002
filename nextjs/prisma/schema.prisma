@@ -25,12 +25,12 @@ model Student {
   sex         UserSex
   createdAt   DateTime     @default(now())
   classId     Int
-  class       Class        @relation(fields: [classId], references: [id])
   gradeId     Int
-  grade       Grade        @relation(fields: [gradeId], references: [id])
+  birthday    DateTime
   attendances Attendance[]
   results     Result[]
-  birthday    DateTime
+  class       Class        @relation(fields: [classId], references: [id])
+  grade       Grade        @relation(fields: [gradeId], references: [id])
 }
 
 model Teacher {
@@ -45,59 +45,55 @@ model Teacher {
   bloodType String
   sex       UserSex
   createdAt DateTime  @default(now())
-  subjects  Subject[]
-  lessons   Lesson[]
-  classes   Class[]
   birthday  DateTime
+  classes   Class[]
+  lessons   Lesson[]
+  subjects  Subject[] @relation("SubjectToTeacher")
 }
 
-
 model Grade {
-  id    Int @id @default(autoincrement())
-  level Int @unique
-
-  students Student[]
+  id       Int       @id @default(autoincrement())
+  level    Int       @unique
   classess Class[]
+  students Student[]
 }
 
 model Class {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  capacity Int
-
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  capacity      Int
   supervisorId  String?
+  gradeId       Int
+  announcements Announcement[]
+  grade         Grade          @relation(fields: [gradeId], references: [id])
   supervisor    Teacher?       @relation(fields: [supervisorId], references: [id])
+  events        Event[]
   lessons       Lesson[]
   students      Student[]
-  gradeId       Int
-  grade         Grade          @relation(fields: [gradeId], references: [id])
-  events        Event[]
-  announcements Announcement[]
 }
 
 model Subject {
   id       Int       @id @default(autoincrement())
   name     String    @unique
-  teachers Teacher[]
   lessons  Lesson[]
+  teachers Teacher[] @relation("SubjectToTeacher")
 }
 
 model Lesson {
-  id        Int      @id @default(autoincrement())
-  name      String
-  day       Day
-  startTime DateTime
-  endTime   DateTime
-
+  id          Int          @id @default(autoincrement())
+  name        String
+  day         Day
+  startTime   DateTime
+  endTime     DateTime
   subjectId   Int
-  subject     Subject      @relation(fields: [subjectId], references: [id])
   classId     Int
-  class       Class        @relation(fields: [classId], references: [id])
   teacherId   String
-  teacher     Teacher      @relation(fields: [teacherId], references: [id])
-  exams       Exam[]
   assignments Assignment[]
   attendances Attendance[]
+  exams       Exam[]
+  class       Class        @relation(fields: [classId], references: [id])
+  subject     Subject      @relation(fields: [subjectId], references: [id])
+  teacher     Teacher      @relation(fields: [teacherId], references: [id])
 }
 
 model Exam {
@@ -105,10 +101,9 @@ model Exam {
   title     String
   startTime DateTime
   endTime   DateTime
-
-  lessonId Int
-  lesson   Lesson   @relation(fields: [lessonId], references: [id])
-  results  Result[]
+  lessonId  Int
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  results   Result[]
 }
 
 model Assignment {
@@ -116,33 +111,30 @@ model Assignment {
   title     String
   startDate DateTime
   dueDate   DateTime
-
-  lessonId Int
-  lesson   Lesson   @relation(fields: [lessonId], references: [id])
-  results  Result[]
+  lessonId  Int
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  results   Result[]
 }
 
 model Result {
-  id    Int @id @default(autoincrement())
-  score Int
-
+  id           Int         @id @default(autoincrement())
+  score        Int
   examId       Int?
-  exam         Exam?       @relation(fields: [examId], references: [id])
   assignmentId Int?
-  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
   studentId    String
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
+  exam         Exam?       @relation(fields: [examId], references: [id])
   student      Student     @relation(fields: [studentId], references: [id])
 }
 
 model Attendance {
-  id      Int      @id @default(autoincrement())
-  date    DateTime
-  present Boolean
-
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  present   Boolean
   studentId String
-  student   Student @relation(fields: [studentId], references: [id])
   lessonId  Int
-  lesson    Lesson  @relation(fields: [lessonId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id])
 }
 
 model Event {
@@ -151,9 +143,8 @@ model Event {
   description String
   startTime   DateTime
   endTime     DateTime
-
-  classId Int?
-  class   Class? @relation(fields: [classId], references: [id])
+  classId     Int?
+  class       Class?   @relation(fields: [classId], references: [id])
 }
 
 model Announcement {
@@ -161,9 +152,402 @@ model Announcement {
   title       String
   description String
   date        DateTime
+  classId     Int?
+  class       Class?   @relation(fields: [classId], references: [id])
+}
 
-  classId Int?
-  class   Class? @relation(fields: [classId], references: [id])
+model auth_group {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @unique @db.VarChar(150)
+  auth_group_permissions auth_group_permissions[]
+  auth_user_groups       auth_user_groups[]
+
+  @@index([name], map: "auth_group_name_a6ea08ec_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_group_permissions {
+  id              BigInt          @id @default(autoincrement())
+  group_id        Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+  auth_group      auth_group      @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id")
+
+  @@unique([group_id, permission_id], map: "auth_group_permissions_group_id_permission_id_0cd325b0_uniq")
+  @@index([group_id], map: "auth_group_permissions_group_id_b120cbf9")
+  @@index([permission_id], map: "auth_group_permissions_permission_id_84c5c92e")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_permission {
+  id                         Int                          @id @default(autoincrement())
+  name                       String                       @db.VarChar(255)
+  content_type_id            Int
+  codename                   String                       @db.VarChar(100)
+  auth_group_permissions     auth_group_permissions[]
+  django_content_type        django_content_type          @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  auth_user_user_permissions auth_user_user_permissions[]
+
+  @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
+  @@index([content_type_id], map: "auth_permission_content_type_id_2f476e4b")
+}
+
+model auth_user {
+  id                                Int                                 @id @default(autoincrement())
+  password                          String                              @db.VarChar(128)
+  last_login                        DateTime?                           @db.Timestamptz(6)
+  is_superuser                      Boolean
+  username                          String                              @unique @db.VarChar(150)
+  first_name                        String                              @db.VarChar(150)
+  last_name                         String                              @db.VarChar(150)
+  email                             String                              @db.VarChar(254)
+  is_staff                          Boolean
+  is_active                         Boolean
+  date_joined                       DateTime                            @db.Timestamptz(6)
+  auth_user_groups                  auth_user_groups[]
+  auth_user_user_permissions        auth_user_user_permissions[]
+  django_admin_log                  django_admin_log[]
+  school_contebras_core_video_video school_contebras_core_video_video[]
+
+  @@index([username], map: "auth_user_username_6821ab7c_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_user_groups {
+  id         BigInt     @id @default(autoincrement())
+  user_id    Int
+  group_id   Int
+  auth_group auth_group @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_groups_group_id_97559544_fk_auth_group_id")
+  auth_user  auth_user  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_groups_user_id_6a12ed8b_fk_auth_user_id")
+
+  @@unique([user_id, group_id], map: "auth_user_groups_user_id_group_id_94350c0c_uniq")
+  @@index([group_id], map: "auth_user_groups_group_id_97559544")
+  @@index([user_id], map: "auth_user_groups_user_id_6a12ed8b")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_user_user_permissions {
+  id              BigInt          @id @default(autoincrement())
+  user_id         Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm")
+  auth_user       auth_user       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id")
+
+  @@unique([user_id, permission_id], map: "auth_user_user_permissions_user_id_permission_id_14a6b632_uniq")
+  @@index([permission_id], map: "auth_user_user_permissions_permission_id_1fbb5f2c")
+  @@index([user_id], map: "auth_user_user_permissions_user_id_a95ead1b")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model django_admin_log {
+  id                  Int                  @id @default(autoincrement())
+  action_time         DateTime             @db.Timestamptz(6)
+  object_id           String?
+  object_repr         String               @db.VarChar(200)
+  action_flag         Int                  @db.SmallInt
+  change_message      String
+  content_type_id     Int?
+  user_id             Int
+  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  auth_user           auth_user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_auth_user_id")
+
+  @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6")
+}
+
+model django_content_type {
+  id               Int                @id @default(autoincrement())
+  app_label        String             @db.VarChar(100)
+  model            String             @db.VarChar(100)
+  auth_permission  auth_permission[]
+  django_admin_log django_admin_log[]
+
+  @@unique([app_label, model], map: "django_content_type_app_label_model_76bd3d3b_uniq")
+}
+
+model django_migrations {
+  id      BigInt   @id @default(autoincrement())
+  app     String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+  applied DateTime @db.Timestamptz(6)
+}
+
+model django_session {
+  session_key  String   @id @db.VarChar(40)
+  session_data String
+  expire_date  DateTime @db.Timestamptz(6)
+
+  @@index([expire_date], map: "django_session_expire_date_a5c62663")
+  @@index([session_key], map: "django_session_session_key_c0390e0f_like")
+}
+
+model school_contebras_core_course_admin {
+  id            BigInt   @id @default(autoincrement())
+  name          String   @db.VarChar(150)
+  email         String   @unique @db.VarChar(254)
+  password_hash String   @db.VarChar(255)
+  created_at    DateTime @db.Timestamptz(6)
+
+  @@index([email], map: "school_contebras_core_course_admin_email_64bfb755_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_assignment {
+  id                                            BigInt                                          @id @default(autoincrement())
+  title                                         String                                          @db.VarChar(150)
+  description                                   String
+  due_date                                      DateTime                                        @db.Date
+  max_score                                     Int
+  lesson_id                                     BigInt
+  school_contebras_core_course_lesson           school_contebras_core_course_lesson             @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_lesson_id_cb0042db_fk_school_co")
+  school_contebras_core_course_assignmentresult school_contebras_core_course_assignmentresult[]
+
+  @@index([lesson_id], map: "school_contebras_core_course_assignment_lesson_id_cb0042db")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_assignmentresult {
+  id                                      BigInt                                  @id @default(autoincrement())
+  score                                   Int
+  submitted_at                            DateTime                                @db.Timestamptz(6)
+  feedback                                String
+  assignment_id                           BigInt
+  student_id                              BigInt
+  school_contebras_core_course_assignment school_contebras_core_course_assignment @relation(fields: [assignment_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_assignment_id_43a0b677_fk_school_co")
+  school_contebras_core_course_student    school_contebras_core_course_student    @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_student_id_abfee93b_fk_school_co")
+
+  @@index([assignment_id], map: "school_contebras_core_cour_assignment_id_43a0b677")
+  @@index([student_id], map: "school_contebras_core_cour_student_id_abfee93b")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_attendance {
+  id                                   BigInt                               @id @default(autoincrement())
+  status                               String                               @db.VarChar(10)
+  date                                 DateTime                             @db.Date
+  lesson_id                            BigInt
+  student_id                           BigInt
+  school_contebras_core_course_lesson  school_contebras_core_course_lesson  @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_lesson_id_2a034194_fk_school_co")
+  school_contebras_core_course_student school_contebras_core_course_student @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_student_id_3dd90952_fk_school_co")
+
+  @@index([lesson_id], map: "school_contebras_core_course_attendance_lesson_id_2a034194")
+  @@index([student_id], map: "school_contebras_core_course_attendance_student_id_3dd90952")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_classroom {
+  id                                                 BigInt                                               @id @default(autoincrement())
+  name                                               String                                               @db.VarChar(100)
+  course_id                                          BigInt
+  grade_id                                           BigInt
+  supervisor_id                                      BigInt?
+  school_contebras_core_course_course                school_contebras_core_course_course                  @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_course_id_8cf901ee_fk_school_co")
+  school_contebras_core_course_grade                 school_contebras_core_course_grade                   @relation(fields: [grade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_grade_id_b9e79d2d_fk_school_co")
+  school_contebras_core_course_teacher               school_contebras_core_course_teacher?                @relation(fields: [supervisor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_supervisor_id_1b0dc745_fk_school_co")
+  school_contebras_core_course_lesson                school_contebras_core_course_lesson[]
+  school_contebras_core_course_registrationclassroom school_contebras_core_course_registrationclassroom[]
+  school_contebras_core_course_student               school_contebras_core_course_student[]
+
+  @@index([course_id], map: "school_contebras_core_course_classroom_course_id_8cf901ee")
+  @@index([grade_id], map: "school_contebras_core_course_classroom_grade_id_b9e79d2d")
+  @@index([supervisor_id], map: "school_contebras_core_course_classroom_supervisor_id_1b0dc745")
+}
+
+model school_contebras_core_course_course {
+  id                                                 BigInt                                               @id @default(autoincrement())
+  titleCourse                                        String                                               @db.VarChar(150)
+  description                                        String
+  school_contebras_core_course_classroom             school_contebras_core_course_classroom[]
+  school_contebras_core_course_registrationclassroom school_contebras_core_course_registrationclassroom[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_exam {
+  id                                      BigInt                                    @id @default(autoincrement())
+  title                                   String                                    @db.VarChar(150)
+  date                                    DateTime                                  @db.Date
+  max_score                               Int
+  lesson_id                               BigInt
+  school_contebras_core_course_lesson     school_contebras_core_course_lesson       @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_lesson_id_1f99a22f_fk_school_co")
+  school_contebras_core_course_examresult school_contebras_core_course_examresult[]
+
+  @@index([lesson_id], map: "school_contebras_core_course_exam_lesson_id_1f99a22f")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_examresult {
+  id                                   BigInt                               @id @default(autoincrement())
+  score                                Int
+  graded_at                            DateTime                             @db.Timestamptz(6)
+  feedback                             String
+  exam_id                              BigInt
+  student_id                           BigInt
+  school_contebras_core_course_exam    school_contebras_core_course_exam    @relation(fields: [exam_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_exam_id_4787d2f5_fk_school_co")
+  school_contebras_core_course_student school_contebras_core_course_student @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_student_id_c0d37c55_fk_school_co")
+
+  @@index([exam_id], map: "school_contebras_core_course_examresult_exam_id_4787d2f5")
+  @@index([student_id], map: "school_contebras_core_course_examresult_student_id_c0d37c55")
+}
+
+model school_contebras_core_course_grade {
+  id                                     BigInt                                   @id @default(autoincrement())
+  name                                   String                                   @db.VarChar(150)
+  description                            String
+  school_contebras_core_course_classroom school_contebras_core_course_classroom[]
+  school_contebras_core_course_student   school_contebras_core_course_student[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_lesson {
+  id                                      BigInt                                    @id @default(autoincrement())
+  date                                    DateTime                                  @db.Date
+  start_time                              DateTime                                  @db.Time(6)
+  end_time                                DateTime                                  @db.Time(6)
+  topic                                   String                                    @db.VarChar(255)
+  classroom_id                            BigInt
+  subject_id                              BigInt
+  teacher_id                              BigInt
+  school_contebras_core_course_assignment school_contebras_core_course_assignment[]
+  school_contebras_core_course_attendance school_contebras_core_course_attendance[]
+  school_contebras_core_course_exam       school_contebras_core_course_exam[]
+  school_contebras_core_course_classroom  school_contebras_core_course_classroom    @relation(fields: [classroom_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_classroom_id_35c7c4e5_fk_school_co")
+  school_contebras_core_course_subject    school_contebras_core_course_subject      @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_subject_id_f6c82ec9_fk_school_co")
+  school_contebras_core_course_teacher    school_contebras_core_course_teacher      @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_teacher_id_c5cf4a1f_fk_school_co")
+
+  @@index([classroom_id], map: "school_contebras_core_course_lesson_classroom_id_35c7c4e5")
+  @@index([subject_id], map: "school_contebras_core_course_lesson_subject_id_f6c82ec9")
+  @@index([teacher_id], map: "school_contebras_core_course_lesson_teacher_id_c5cf4a1f")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_registrationclassroom {
+  id                                     BigInt                                 @id @default(autoincrement())
+  registration_date                      DateTime                               @db.Date
+  last_monthly_date                      DateTime?                              @db.Date
+  classroom_id                           BigInt
+  course_id                              BigInt
+  student_id                             BigInt
+  school_contebras_core_course_classroom school_contebras_core_course_classroom @relation(fields: [classroom_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_classroom_id_6a470de8_fk_school_co")
+  school_contebras_core_course_course    school_contebras_core_course_course    @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_course_id_ebe2e788_fk_school_co")
+  school_contebras_core_course_student   school_contebras_core_course_student   @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_student_id_73485e13_fk_school_co")
+
+  @@index([classroom_id], map: "school_contebras_core_cour_classroom_id_6a470de8")
+  @@index([course_id], map: "school_contebras_core_cour_course_id_ebe2e788")
+  @@index([student_id], map: "school_contebras_core_cour_student_id_73485e13")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_student {
+  id                                                 BigInt                                               @id @default(autoincrement())
+  username                                           String                                               @unique @db.VarChar(100)
+  name                                               String                                               @db.VarChar(150)
+  surname                                            String                                               @db.VarChar(100)
+  email                                              String                                               @db.VarChar(100)
+  phone                                              String                                               @db.VarChar(20)
+  address                                            String?                                              @db.VarChar(255)
+  img                                                String?                                              @db.VarChar(100)
+  sex                                                String                                               @db.VarChar(10)
+  birthday                                           DateTime                                             @db.Date
+  createdAt                                          DateTime                                             @db.Timestamptz(6)
+  classroom_id                                       BigInt?
+  grade_id                                           BigInt?
+  school_contebras_core_course_assignmentresult      school_contebras_core_course_assignmentresult[]
+  school_contebras_core_course_attendance            school_contebras_core_course_attendance[]
+  school_contebras_core_course_examresult            school_contebras_core_course_examresult[]
+  school_contebras_core_course_registrationclassroom school_contebras_core_course_registrationclassroom[]
+  school_contebras_core_course_classroom             school_contebras_core_course_classroom?              @relation(fields: [classroom_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_classroom_id_f70999a3_fk_school_co")
+  school_contebras_core_course_grade                 school_contebras_core_course_grade?                  @relation(fields: [grade_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_grade_id_f7ed4fb3_fk_school_co")
+
+  @@index([classroom_id], map: "school_contebras_core_course_student_classroom_id_f70999a3")
+  @@index([grade_id], map: "school_contebras_core_course_student_grade_id_f7ed4fb3")
+  @@index([username], map: "school_contebras_core_course_student_username_45114c58_like")
+}
+
+model school_contebras_core_course_subject {
+  id                                            BigInt                                          @id @default(autoincrement())
+  name                                          String                                          @db.VarChar(150)
+  description                                   String
+  school_contebras_core_course_lesson           school_contebras_core_course_lesson[]
+  school_contebras_core_course_teacher_subjects school_contebras_core_course_teacher_subjects[]
+}
+
+model school_contebras_core_course_teacher {
+  id                                            BigInt                                          @id @default(autoincrement())
+  name                                          String                                          @db.VarChar(150)
+  email                                         String                                          @unique @db.VarChar(254)
+  password_hash                                 String                                          @db.VarChar(255)
+  hire_date                                     DateTime                                        @db.Date
+  phone                                         String                                          @db.VarChar(20)
+  school_contebras_core_course_classroom        school_contebras_core_course_classroom[]
+  school_contebras_core_course_lesson           school_contebras_core_course_lesson[]
+  school_contebras_core_course_teacher_subjects school_contebras_core_course_teacher_subjects[]
+
+  @@index([email], map: "school_contebras_core_course_teacher_email_d7b2b9e0_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_course_teacher_subjects {
+  id                                   BigInt                               @id @default(autoincrement())
+  teacher_id                           BigInt
+  subject_id                           BigInt
+  school_contebras_core_course_subject school_contebras_core_course_subject @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_subject_id_af3f43d5_fk_school_co")
+  school_contebras_core_course_teacher school_contebras_core_course_teacher @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_teacher_id_d8f98bfe_fk_school_co")
+
+  @@unique([teacher_id, subject_id], map: "school_contebras_core_co_teacher_id_subject_id_ea3b3762_uniq")
+  @@index([subject_id], map: "school_contebras_core_cour_subject_id_af3f43d5")
+  @@index([teacher_id], map: "school_contebras_core_cour_teacher_id_d8f98bfe")
+}
+
+model school_contebras_core_video_tag {
+  id                                     BigInt                                   @id @default(autoincrement())
+  name                                   String                                   @unique @db.VarChar(50)
+  school_contebras_core_video_video_tags school_contebras_core_video_video_tags[]
+
+  @@index([name], map: "school_contebras_core_video_tag_name_b4238be0_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_video_video {
+  id                                     BigInt                                   @id @default(autoincrement())
+  title                                  String                                   @unique @db.VarChar(100)
+  description                            String
+  thumbnail                              String                                   @db.VarChar(100)
+  slug                                   String                                   @unique @db.VarChar(50)
+  published_at                           DateTime?                                @db.Timestamptz(6)
+  is_published                           Boolean
+  num_likes                              Int
+  num_views                              Int
+  author_id                              Int
+  auth_user                              auth_user                                @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_author_id_6e1893b2_fk_auth_user")
+  school_contebras_core_video_video_tags school_contebras_core_video_video_tags[]
+  school_contebras_core_video_videomedia school_contebras_core_video_videomedia?
+
+  @@index([author_id], map: "school_contebras_core_video_video_author_id_6e1893b2")
+  @@index([slug], map: "school_contebras_core_video_video_slug_73930876_like")
+  @@index([title], map: "school_contebras_core_video_video_title_2e0a6110_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_video_video_tags {
+  id                                BigInt                            @id @default(autoincrement())
+  video_id                          BigInt
+  tag_id                            BigInt
+  school_contebras_core_video_tag   school_contebras_core_video_tag   @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_tag_id_5a181728_fk_school_co")
+  school_contebras_core_video_video school_contebras_core_video_video @relation(fields: [video_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_video_id_fecc6e8a_fk_school_co")
+
+  @@unique([video_id, tag_id], map: "school_contebras_core_vi_video_id_tag_id_3a15058a_uniq")
+  @@index([tag_id], map: "school_contebras_core_video_video_tags_tag_id_5a181728")
+  @@index([video_id], map: "school_contebras_core_video_video_tags_video_id_fecc6e8a")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model school_contebras_core_video_videomedia {
+  id                                BigInt                            @id @default(autoincrement())
+  video_path                        String                            @db.VarChar(255)
+  status                            String                            @db.VarChar(20)
+  video_id                          BigInt                            @unique
+  school_contebras_core_video_video school_contebras_core_video_video @relation(fields: [video_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_contebras_cor_video_id_9c2c9951_fk_school_co")
 }
 
 enum UserSex {
@@ -178,11 +562,3 @@ enum Day {
   THURSDAY
   FRIDAY
 }
-
-// dicionário de relações entre as tabelas 
-
-//  Terá um administrador que gerencia as turmas, professores e alunos.
-//  Cada professor terá várias matérias(Subject), lições(Lesson) e turmas(Class) e cada turma terá  alunos(Student); um aluno terá uma série(Grade), turma(Class).exame-provas(exam) ou tarefas(assigment result) e compareceimento(attendence).
-// Cada série terá várias turmas(Class) e cada turma pertence a uma série.Cada turma terá uma série(Grade), um professor responsável(Teacher) e vários alunos(Student) e lições(Lesson).
-// Uma lição(Lesson) terá um professor responsável(Teacher), uma turma(Class) e uma exams(exam).e tarefas(assignment).E cada exame(Exam) terá uma tarefa(Assignment) e umesultado(Result).Nam tabela de comparecimento(Attendance), o estudante terá um registro de presença(present) ou falta(absnet) dada na lição(Lesson).
-

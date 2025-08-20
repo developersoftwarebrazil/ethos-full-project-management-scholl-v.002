@@ -4,7 +4,7 @@ from django.http import HttpRequest
 
 from school_contebras_core_course.models import (
     Student, Course, Classroom, RegistrationClassroom,
-    Admin, Teacher, Subject, Grade, Lesson,
+    SchoolAdmin, Teacher, Subject, Grade, Lesson,
     Exam, Assignment, ExamResult, AssignmentResult, Attendance
 )
 
@@ -48,7 +48,7 @@ class RegistrationAdmin(admin.ModelAdmin):
 # NOVOS MODELOS ESCOLARES
 # ========================
 
-@admin.register(Admin)
+@admin.register(SchoolAdmin)
 class AdminAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'created_at')
     search_fields = ('name', 'email')

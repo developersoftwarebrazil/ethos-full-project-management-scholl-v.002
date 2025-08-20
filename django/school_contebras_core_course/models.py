@@ -40,7 +40,7 @@ def file_name(instance, filename):
 # MODELOS ESCOLARES
 # ===========================
 
-class Admin(models.Model):
+class SchoolAdmin(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome do Administrador")
     email = models.EmailField(unique=True, verbose_name="E-mail")
     password_hash = models.CharField(max_length=255, verbose_name="Senha (Hash)")
