@@ -1,5 +1,13 @@
 from rest_framework import serializers
-from .models import Student, Course, Classroom
+from .models import Teacher,Student, Course, Classroom
+
+class TeacherSerializer(serializers.ModelSerializer):
+    # Se quiser incluir as disciplinas como lista de nomes:
+    subjects = serializers.StringRelatedField(many=True)
+    
+    class Meta:
+        model = Teacher
+        fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
