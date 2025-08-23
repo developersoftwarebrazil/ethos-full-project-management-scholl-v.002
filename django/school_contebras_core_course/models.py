@@ -40,19 +40,20 @@ def file_name(instance, filename):
 # MODELOS ESCOLARES
 # ===========================
 
+
+
 class SchoolAdmin(models.Model):
+    id = models.CharField(max_length=255, primary_key=True,editable=False)
+    username = models.CharField(max_length=150, unique=True, verbose_name="Nome de usuário")
     name = models.CharField(max_length=150, verbose_name="Nome do Administrador")
-    email = models.EmailField(unique=True, verbose_name="E-mail")
-    password_hash = models.CharField(max_length=255, verbose_name="Senha (Hash)")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Criado em")
+    email = models.EmailField(max_length=255, unique=True, verbose_name="E-mail")
 
     class Meta:
         verbose_name = "Administrador"
         verbose_name_plural = "Administradores"
 
     def __str__(self):
-        return self.name
-
+        return self.username
 
 class Course(models.Model):
     titleCourse = models.CharField(max_length=150, verbose_name="Título do curso")

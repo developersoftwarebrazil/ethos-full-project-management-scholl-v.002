@@ -1,4 +1,5 @@
 # school_contebras_core_course/management/commands/seed.py
+import uuid
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from school_contebras_core_course.models import (
@@ -17,12 +18,23 @@ class Command(BaseCommand):
         # ADMIN
         # ========================
         admins_data = [
-            {"name": "Admin 1", "email": "admin1@example.com", "password_hash": "hash1"},
-            {"name": "Admin 2", "email": "admin2@example.com", "password_hash": "hash2"},
+            {"username": "admin1", "name": "Admin 1", "email": "admin1@example.com"},
+            {"username": "admin2", "name": "Admin 2", "email": "admin2@example.com"},
         ]
-        for data in admins_data:
-            SchoolAdmin.objects.get_or_create(email=data["email"], defaults=data)
 
+        for data in admins_data:
+            obj, created = SchoolAdmin.objects.get_or_create(
+                email=data["email"],
+                defaults={
+                    "id": str(uuid.uuid4()),
+                    "username": data["username"],
+                    "name": data["name"]
+                }
+            )
+            if created:
+                self.stdout.write(self.style.SUCCESS(f"Admin criado: {obj.username}"))
+            else:
+                self.stdout.write(self.style.WARNING(f"Admin já existe: {obj.username}"))
         # ========================
         # GRADE
         # ========================

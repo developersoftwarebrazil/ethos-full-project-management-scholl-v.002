@@ -12,6 +12,7 @@ model Admin {
   username String @unique
 }
 
+
 model Student {
   id          String       @id
   username    String       @unique

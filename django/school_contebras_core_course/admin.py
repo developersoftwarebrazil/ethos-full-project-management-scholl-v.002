@@ -50,9 +50,9 @@ class RegistrationAdmin(admin.ModelAdmin):
 
 @admin.register(SchoolAdmin)
 class AdminAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'created_at')
-    search_fields = ('name', 'email')
-    list_filter = ('created_at',)
+    list_display = ('username','name','email')
+    search_fields = ('username','name','email')
+
 
 
 @admin.register(Teacher)
