@@ -119,17 +119,36 @@ class Teacher(models.Model):
     def __str__(self):
         return f"{self.name} {self.surname}"
 
+from django.db import models
+
 class Subject(models.Model):
-    name = models.CharField(max_length=150, verbose_name="Nome da Disciplina")
-    description = models.TextField(verbose_name="Descrição da Disciplina")
+    name = models.CharField(
+        max_length=150,
+        unique=True,
+        verbose_name="Nome da Matéria"
+    )
+    description = models.TextField(
+        verbose_name="Descrição da Matéria",
+        blank=True,
+        null=True
+    )
+
+    # Relação 1:N com Lesson (Lesson deve ter ForeignKey para Subject)
+    # lessons = models.RelatedManager automático pelo Django (não precisa declarar aqui)
+
+    # Relação N:N com Teacher
+    teachers = models.ManyToManyField(
+        "Teacher",
+        related_name="subjects",
+        verbose_name="Professores"
+    )
 
     class Meta:
-        verbose_name = "Disciplina"
-        verbose_name_plural = "Disciplinas"
+        verbose_name = "Matéria"
+        verbose_name_plural = "Matérias"
 
     def __str__(self):
         return self.name
-
 
 class Classroom(models.Model):
     name = models.CharField(max_length=100, verbose_name='Turma')

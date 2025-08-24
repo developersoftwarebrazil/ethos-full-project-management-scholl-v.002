@@ -27,37 +27,37 @@ class StudentAdmin(admin.ModelAdmin):
         'bloodType', 'sex', 'birthday', 'classroom', 'grade', 'createdAt'
     )
     
-    # Filtros laterais
-    list_filter = (
-        'sex', 'bloodType', 'classroom', 'grade', 'createdAt'
-    )
+    # # Filtros laterais
+    # list_filter = (
+    #     'sex', 'bloodType', 'classroom', 'grade', 'createdAt'
+    # )
     
-    # Campos pesquisáveis
-    search_fields = (
-        'username', 'name', 'surname', 'email', 'phone'
-    )
+    # # Campos pesquisáveis
+    # search_fields = (
+    #     'username', 'name', 'surname', 'email', 'phone'
+    # )
     
-    # Ordem padrão
-    ordering = ('-createdAt',)
+    # # Ordem padrão
+    # ordering = ('-createdAt',)
     
-    # Campos somente leitura
-    readonly_fields = ('createdAt',)
+    # # Campos somente leitura
+    # readonly_fields = ('createdAt',)
     
-    # Organização do formulário de edição
-    fieldsets = (
-        ('Informações Básicas', {
-            'fields': ('id', 'username', 'name', 'surname', 'email', 'phone')
-        }),
-        ('Detalhes Pessoais', {
-            'fields': ('sex', 'birthday', 'bloodType', 'address', 'img')
-        }),
-        ('Acadêmico', {
-            'fields': ('classroom', 'grade')
-        }),
-        ('Sistema', {
-            'fields': ('createdAt',),
-        }),
-    )
+    # # Organização do formulário de edição
+    # fieldsets = (
+    #     ('Informações Básicas', {
+    #         'fields': ('id', 'username', 'name', 'surname', 'email', 'phone')
+    #     }),
+    #     ('Detalhes Pessoais', {
+    #         'fields': ('sex', 'birthday', 'bloodType', 'address', 'img')
+    #     }),
+    #     ('Acadêmico', {
+    #         'fields': ('classroom', 'grade')
+    #     }),
+    #     ('Sistema', {
+    #         'fields': ('createdAt',),
+    #     }),
+    # )
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('name', 'course')
@@ -92,6 +92,7 @@ class AdminAdmin(admin.ModelAdmin):
 class TeacherAdmin(admin.ModelAdmin):
     # Campos exibidos na lista
     list_display = (
+        'id',
         'username',
         'name',
         'surname',
