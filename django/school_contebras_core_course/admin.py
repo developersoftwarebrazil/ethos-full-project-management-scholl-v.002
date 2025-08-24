@@ -21,10 +21,43 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email')
-    list_filter = ('name', 'email')
-    search_fields = ('name', 'email')
-
+ # Colunas exibidas na lista
+    list_display = (
+        'username', 'name', 'surname', 'email', 'phone',
+        'bloodType', 'sex', 'birthday', 'classroom', 'grade', 'createdAt'
+    )
+    
+    # Filtros laterais
+    list_filter = (
+        'sex', 'bloodType', 'classroom', 'grade', 'createdAt'
+    )
+    
+    # Campos pesquisáveis
+    search_fields = (
+        'username', 'name', 'surname', 'email', 'phone'
+    )
+    
+    # Ordem padrão
+    ordering = ('-createdAt',)
+    
+    # Campos somente leitura
+    readonly_fields = ('createdAt',)
+    
+    # Organização do formulário de edição
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('id', 'username', 'name', 'surname', 'email', 'phone')
+        }),
+        ('Detalhes Pessoais', {
+            'fields': ('sex', 'birthday', 'bloodType', 'address', 'img')
+        }),
+        ('Acadêmico', {
+            'fields': ('classroom', 'grade')
+        }),
+        ('Sistema', {
+            'fields': ('createdAt',),
+        }),
+    )
 
 class ClassroomAdmin(admin.ModelAdmin):
     list_display = ('name', 'course')

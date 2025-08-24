@@ -51,6 +51,9 @@ def file_name(instance, filename):
 
 
 
+# ===========================
+# ADMINS ok
+
 class SchoolAdmin(models.Model):
     id = models.CharField(max_length=255, primary_key=True,editable=False)
     username = models.CharField(max_length=150, unique=True, verbose_name="Nome de usuário")
@@ -90,7 +93,7 @@ class Grade(models.Model):
 
 
 # ===========================
-# Teacher Model
+# Teacher Model ok
 # ===========================
 class Teacher(models.Model):
     username = models.CharField(max_length=50, unique=True, verbose_name="Nome de Usuário")
@@ -142,27 +145,36 @@ class Classroom(models.Model):
         return f'Turma {self.name} - {self.course.titleCourse}'
 
 
+
 class Student(models.Model):
+    id = models.CharField(primary_key=True, max_length=50, editable=False)  # compatível com Prisma String @id
     username = models.CharField(max_length=100, unique=True, verbose_name='Nome de usuário')
     name = models.CharField(max_length=150, verbose_name='Nome')
     surname = models.CharField(max_length=100, verbose_name='Sobrenome')
-    email = models.EmailField(max_length=100, verbose_name='E-mail')
-    phone = models.CharField(max_length=20, verbose_name='Telefone')
+    email = models.EmailField(max_length=100, unique=True, null=True, blank=True, verbose_name='E-mail')
+    phone = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name='Telefone')
     address = models.CharField(max_length=255, null=True, blank=True, verbose_name='Endereço')
-    img = models.ImageField(upload_to=file_name, null=True, verbose_name='Foto', blank=True)
+    img = models.ImageField(upload_to=file_name, null=True, blank=True, verbose_name='Foto')
+    bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, verbose_name='Tipo Sanguíneo')
     sex = models.CharField(max_length=10, choices=SEX_CHOICES, verbose_name='Sexo')
     birthday = models.DateField(verbose_name='Data de Nascimento')
-    createdAt = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
-    classroom = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, related_name='students', verbose_name='Turma')
-    grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True, related_name='students', verbose_name='Série')
+    createdAt = models.DateTimeField(default=timezone.now, verbose_name='Criado em')
+    
+    classroom = models.ForeignKey("Classroom", on_delete=models.SET_NULL, null=True, related_name='students', verbose_name='Turma')
+    grade = models.ForeignKey("Grade", on_delete=models.SET_NULL, null=True, related_name='students', verbose_name='Série')
+
+    # Relacionamentos (equivalentes a Attendance[] e Result[])
+    # Student -> Attendance (One-to-Many)
+    # Student -> Result (One-to-Many)
+    # No Django isso será representado nos modelos Attendance e Result, 
+    # cada um com ForeignKey(Student).
 
     class Meta:
         verbose_name = "Aluno"
         verbose_name_plural = "Alunos"
 
     def __str__(self):
-        return self.name
-
+        return f"{self.name} {self.surname}"
 
 class RegistrationClassroom(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

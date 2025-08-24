@@ -5,7 +5,7 @@ import uuid
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from school_contebras_core_course.models import (
-    SchoolAdmin, Course, Grade, Subject, Teacher, Classroom, Student, Lesson,
+    BLOOD_TYPE_CHOICES, SchoolAdmin, Course, Grade, Subject, Teacher, Classroom, Student, Lesson,
 )
 from datetime import date, timedelta
 import random
@@ -75,7 +75,8 @@ class Command(BaseCommand):
       
         teachers = []
 
-        blood_types = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+        # blood_types = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+        blood_types = [choice[0] for choice in BLOOD_TYPE_CHOICES]
         sex_choices = ['MALE', 'FEMALE', 'OTHER']
 
         for i in range(1, 16):
@@ -97,7 +98,7 @@ class Command(BaseCommand):
         }
     )
     # Assign random subjects (pode ser mais de um)
-        teacher.subjects.set(random.sample(subjects, k=min(len(subjects), random.randint(1, 3))))
+        teacher.subjects.set(random.sample(subjects, k=min(len(subjects), random.randint(1, 5))))
         teachers.append(teacher)
 
         print(f"{len(teachers)} teachers seeded successfully!")
@@ -119,21 +120,32 @@ class Command(BaseCommand):
         # STUDENT
         # ========================
         students = []
+        grades = list(Grade.objects.all())
+        classrooms = list(Classroom.objects.all())
+        blood_types = [choice[0] for choice in BLOOD_TYPE_CHOICES]
+
         for i in range(1, 51):
             student, _ = Student.objects.get_or_create(
-                username=f"student{i}",
-                defaults={
-                    "name": f"SName{i}",
-                    "surname": f"SSurname{i}",
-                    "email": f"student{i}@example.com",
-                    "phone": f"987-654-32{i:02d}",
-                    "sex": "MALE" if i % 2 == 0 else "FEMALE",
-                    "birthday": date.today() - timedelta(days=365*10),
-                    "grade": random.choice(grades),
-                    "classroom": random.choice(classrooms)
-                }
-            )
-            students.append(student)
+            username=f"student{i}",
+            defaults={
+                "id": str(uuid.uuid4()),  # gera um UUID para o campo id
+                "name": f"SName{i}",
+                "surname": f"SSurname{i}",
+                "email": f"student{i}@example.com",
+                "phone": f"987-654-32{i:02d}",
+                "sex": "MALE" if i % 2 == 0 else "FEMALE",
+                "bloodType": random.choice(blood_types),
+                "address": f"Rua Exemplo {i}, Cidade XYZ",
+                "birthday": date.today() - timedelta(days=365*10 + i),  # pequenas variações
+                "grade": random.choice(grades),
+                "classroom": random.choice(classrooms),
+                "createdAt": timezone.now(),
+                "img": None  # ou um caminho default se preferir
+            }
+        )
+        students.append(student)
+    
+        print(f"{len(students)} estudantes inseridos/atualizados.")
 
         # ========================
         # LESSON
