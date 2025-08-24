@@ -22,7 +22,16 @@ DAY_CHOICES = [
     ('THURSDAY', 'Quinta-feira'),
     ('FRIDAY', 'Sexta-feira'),
 ]
-
+BLOOD_TYPE_CHOICES = [
+    ('A+', 'A+'),
+    ('A-', 'A-'),
+    ('B+', 'B+'),
+    ('B-', 'B-'),
+    ('AB+', 'AB+'),
+    ('AB-', 'AB-'),
+    ('O+', 'O+'),
+    ('O-', 'O-'),
+]
 # ===========================
 # Função para upload seguro de arquivos
 # ===========================
@@ -79,12 +88,25 @@ class Grade(models.Model):
         return self.name
 
 
+
+# ===========================
+# Teacher Model
+# ===========================
 class Teacher(models.Model):
-    name = models.CharField(max_length=150, verbose_name="Nome do Professor")
-    email = models.EmailField(unique=True, verbose_name="E-mail")
+    username = models.CharField(max_length=50, unique=True, verbose_name="Nome de Usuário")
+    name = models.CharField(max_length=150, verbose_name="Nome")
+    surname = models.CharField(max_length=150, verbose_name="Sobrenome")
+    email = models.EmailField(unique=True, null=True, blank=True, verbose_name="E-mail")
+    phone = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="Telefone")
+    address = models.CharField(max_length=255, verbose_name="Endereço")
+    img = models.ImageField(upload_to='teachers/', null=True, blank=True, verbose_name="Foto")
+    bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, verbose_name="Tipo Sanguíneo")
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES, verbose_name="Sexo")
     password_hash = models.CharField(max_length=255, verbose_name="Senha (Hash)")
     hire_date = models.DateField(verbose_name="Data de Contratação")
-    phone = models.CharField(max_length=20, verbose_name="Telefone")
+    birthday = models.DateField(verbose_name="Data de Nascimento")
+    createdAt = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
+    
     subjects = models.ManyToManyField('Subject', related_name='teachers', verbose_name="Disciplinas")
 
     class Meta:
@@ -92,8 +114,7 @@ class Teacher(models.Model):
         verbose_name_plural = "Professores"
 
     def __str__(self):
-        return self.name
-
+        return f"{self.name} {self.surname}"
 
 class Subject(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Disciplina")

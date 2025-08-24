@@ -1,5 +1,7 @@
 # school_contebras_core_course/management/commands/seed.py
+import datetime
 import uuid
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from school_contebras_core_course.models import (
@@ -70,20 +72,35 @@ class Command(BaseCommand):
         # ========================
         # TEACHER
         # ========================
+      
         teachers = []
+
+        blood_types = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+        sex_choices = ['MALE', 'FEMALE', 'OTHER']
+
         for i in range(1, 16):
             teacher, _ = Teacher.objects.get_or_create(
-                email=f"teacher{i}@example.com",
-                defaults={
-                    "name": f"TName{i}",
-                    "password_hash": "hash_teacher",
-                    "hire_date": date.today() - timedelta(days=365*5),
-                    "phone": f"123-456-78{i:02d}",
-                }
-            )
-            # Assign subjects randomly
-            teacher.subjects.set([random.choice(subjects)])
-            teachers.append(teacher)
+            email=f"teacher{i}@example.com",
+            defaults={
+            "username": f"teacher{i}",
+            "name": f"TName{i}",
+            "surname": f"TSurname{i}",
+            "password_hash": "hash_teacher",
+            "hire_date": date.today() - timedelta(days=365*5),
+            "birthday": date.today() - timedelta(days=365*30 + random.randint(0, 365)),  # ~30 anos
+            "phone": f"123-456-78{i:02d}",
+            "address": f"Rua {i}, Bairro Exemplo, Cidade X",
+            "bloodType": random.choice(blood_types),
+            "sex": random.choice(sex_choices),
+            "createdAt": timezone.now(),
+            "img": None,  # ou algum valor padrão se desejar
+        }
+    )
+    # Assign random subjects (pode ser mais de um)
+        teacher.subjects.set(random.sample(subjects, k=min(len(subjects), random.randint(1, 3))))
+        teachers.append(teacher)
+
+        print(f"{len(teachers)} teachers seeded successfully!")
 
         # ========================
         # CLASSROOM

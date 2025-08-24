@@ -57,11 +57,49 @@ class AdminAdmin(admin.ModelAdmin):
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'hire_date', 'phone')
-    search_fields = ('name', 'email', 'phone')
-    list_filter = ('hire_date',)
+    # Campos exibidos na lista
+    list_display = (
+        'username',
+        'name',
+        'surname',
+        'email',
+        'phone',
+        'sex',
+        'bloodType',
+        'hire_date',
+        'birthday',
+        'createdAt'
+    )
 
+    # Campos pesquisáveis
+    search_fields = (
+        'username',
+        'name',
+        'surname',
+        'email',
+        'phone',
+        'address',
+    )
 
+    # Filtros laterais
+    list_filter = (
+        'sex',
+        'bloodType',
+        'hire_date',
+        'createdAt',
+        'subjects',
+    )
+
+    # Campos que podem ser editáveis diretamente na lista
+    list_editable = (
+        'phone',
+        'email',
+        'sex',
+        'bloodType',
+    )
+
+    # Exibir muitos-para-muitos inline (opcional)
+    filter_horizontal = ('subjects',)
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'description')
