@@ -3,29 +3,37 @@ import Table from "@/components/Lists/Table";
 import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
 import { role, teachersData } from "@/lib/data";
+import { console } from "inspector";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
+
+type TeachingSubject = {
+  id: number;
+  name: string;
+  description: string;
+};
 
 type Teacher = {
   id?: number | string;
   teacherId: number | string;
   name: string;
+  username: string;
   email: string;
   phone: string;
-  subjects: string[];
-  // classes: string[];
+  teaching_subjects:TeachingSubject[];
+  classes: string[];
   photo?: string;
   hire_date: string;
 };
 
 const columns = [
   { headers: "Info", accessor: "info" },
-  // {
-  //   headers: "Teacher ID",
-  //   accessor: "teacherId",
-  //   className: "hidden md:table-cell",
-  // },
+  {
+    headers: "Nome de usuário",
+    accessor: "username",
+    className: "hidden md:table-cell",
+  },
   {
     headers: "Matérias",
     accessor: "subjects",
@@ -54,17 +62,17 @@ async function getTeachers(): Promise<Teacher[]> {
 }
 
 const TeacherListPage = async () => {
-  const teachers = await getTeachers();
+  const data = await getTeachers();
 
   const renderRow = (item: Teacher) => (
     <tr
-      key={item.teacherId}
+      key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       {/* Info */}
       <td className="flex items-center gap-4 p-4">
         <Image
-          src={item.photo || "/avatar.png"}
+          src={item.photo || "/noAvatar.png"}
           alt=""
           width={40}
           height={40}
@@ -72,15 +80,17 @@ const TeacherListPage = async () => {
         />
         <div className="flex flex-col">
           <h3 className="font-semibold">{item.name}</h3>
-          <p className="text-xs text-gray-500">{item.email}</p>
+          <p className="text-xs text-gray-500">{item?.email}</p>
         </div>
       </td>
 
       {/* Teacher ID */}
-      {/* <td className="hidden md:table-cell">{item.teacherId}</td> */}
+      <td className="hidden md:table-cell">{item.username}</td>
 
       {/* Subjects */}
-      <td className="hidden md:table-cell">{item.subjects.join(", ")}</td>
+      <td className="hidden md:table-cell">
+        {item.teaching_subjects?.map((subject) => subject.name)?.join(", ")}
+      </td>
 
       {/* Classes */}
       {/* <td className="hidden md:table-cell">{item.classes.join(", ")}</td> */}
@@ -131,7 +141,7 @@ const TeacherListPage = async () => {
       </div>
 
       {/* LIST */}
-      <Table columns={columns} renderRow={renderRow} data={teachers} />
+      <Table columns={columns} renderRow={renderRow} data={data} />
 
       {/* PAGINATION */}
       <Pagination />

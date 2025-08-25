@@ -88,6 +88,10 @@ class AdminAdmin(admin.ModelAdmin):
 
 
 
+class SubjectInline(admin.TabularInline):
+    model = Subject.teachers.through  # tabela intermediária do ManyToMany
+    extra = 1
+
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     # Campos exibidos na lista
@@ -121,7 +125,7 @@ class TeacherAdmin(admin.ModelAdmin):
         'bloodType',
         'hire_date',
         'createdAt',
-        'subjects',
+        # 'subjects',
     )
 
     # Campos que podem ser editáveis diretamente na lista
@@ -133,24 +137,25 @@ class TeacherAdmin(admin.ModelAdmin):
     )
 
     # Exibir muitos-para-muitos inline (opcional)
-    filter_horizontal = ('subjects',)
+   
+    inlines = [SubjectInline]  # <- mostra a relação ManyToMany inline
+
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
-    search_fields = ('name', 'description')
-
-
-@admin.register(Grade)
-class GradeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
-    search_fields = ('name', 'description')
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    filter_horizontal = ("teachers",)  # para facilitar seleção ManyToMany
 
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'classroom', 'teacher', 'date', 'start_time', 'end_time', 'topic')
-    list_filter = ('subject', 'classroom', 'teacher', 'date')
-    search_fields = ('topic', 'subject__name')
+    list_display = ("name", "day", "start_time", "end_time", "subject", "class_ref", "teacher")
+    list_filter = ("day", "subject", "class_ref", "teacher")
+    search_fields = ("name", "subject__name", "teacher__name")
+@admin.register(Grade)
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    search_fields = ('name', 'description')
 
 
 @admin.register(Exam)

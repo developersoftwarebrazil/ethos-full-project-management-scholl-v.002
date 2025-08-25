@@ -98,7 +98,7 @@ class Command(BaseCommand):
         }
     )
     # Assign random subjects (pode ser mais de um)
-        teacher.teaching_subjects.set(random.sample(subjects, k=min(len(subjects), random.randint(1, 5))))
+        teacher.subjects.set(random.sample(subjects, k=min(len(subjects), random.randint(1, 5))))
         teachers.append(teacher)
 
         print(f"{len(teachers)} teachers seeded successfully!")
@@ -150,28 +150,15 @@ class Command(BaseCommand):
         # ========================
         # LESSON
         # ========================
-        day_choices = [choice[0] for choice in Lesson._meta.get_field("day").choices]
-
         for i in range(1, 31):
-            subject = random.choice(subjects)
-            
-            # Escolhe um professor que leciona essa matéria
-            eligible_teachers = list(subject.teachers.all())
-            if not eligible_teachers:
-                continue  # pula se nenhum professor disponível
-            teacher = random.choice(eligible_teachers)
-
             Lesson.objects.get_or_create(
-                name=f"Aula {i}",
-                day=random.choice(day_choices),
-                start_time=(timezone.now() + timedelta(hours=random.randint(7, 12))).time(),
-                end_time=(timezone.now() + timedelta(hours=random.randint(13, 18))).time(),
-                subject=subject,
-                class_ref=random.choice(classrooms),
-                teacher=teacher,
+                classroom=random.choice(classrooms),
+                subject=random.choice(subjects),
+                teacher=random.choice(teachers),
+                date=date.today() + timedelta(days=i),
+                start_time=timezone.now().time(),
+                end_time=(timezone.now() + timedelta(hours=1)).time(),
+                topic=f"Tópico {i}"
             )
-
-        print(f"{Lesson.objects.count()} lessons inseridas/atualizadas.")
-
 
         self.stdout.write(self.style.SUCCESS("Database seeded successfully."))

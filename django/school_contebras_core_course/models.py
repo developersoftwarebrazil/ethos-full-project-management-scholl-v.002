@@ -110,7 +110,7 @@ class Teacher(models.Model):
     birthday = models.DateField(verbose_name="Data de Nascimento")
     createdAt = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
     
-    subjects = models.ManyToManyField('Subject', related_name='teachers', verbose_name="Disciplinas")
+    # subjects = models.ManyToManyField('Subject', related_name='teachers', verbose_name="Disciplinas")
 
     class Meta:
         verbose_name = "Professor"
@@ -139,7 +139,7 @@ class Subject(models.Model):
     # Relação N:N com Teacher
     teachers = models.ManyToManyField(
         "Teacher",
-        related_name="subjects",
+        related_name="teaching_subjects",  # evita colisão
         verbose_name="Professores"
     )
 
@@ -216,22 +216,54 @@ class RegistrationClassroom(models.Model):
         return date.today() <= due_date
 
 
+# class Lesson(models.Model):
+#     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, verbose_name='Turma')
+#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Disciplina')
+#     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name='Professor')
+#     date = models.DateField()
+#     start_time = models.TimeField(verbose_name='Hora de Início')
+#     end_time = models.TimeField(verbose_name='Hora de Término')
+#     topic = models.CharField(max_length=255, verbose_name='Tópico')
+
+#     class Meta:
+#         verbose_name = "Aula"
+#         verbose_name_plural = "Aulas"
+
+#     def __str__(self):
+#         return f"{self.subject.name} - {self.date}"
+
+
 class Lesson(models.Model):
-    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, verbose_name='Turma')
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Disciplina')
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name='Professor')
-    date = models.DateField()
-    start_time = models.TimeField(verbose_name='Hora de Início')
-    end_time = models.TimeField(verbose_name='Hora de Término')
-    topic = models.CharField(max_length=255, verbose_name='Tópico')
+    name = models.CharField(max_length=150, verbose_name="Nome da Aula")
+    day = models.CharField(max_length=15, choices=DAY_CHOICES, verbose_name="Dia da Semana")
+    start_time = models.TimeField(verbose_name="Hora de Início")
+    end_time = models.TimeField(verbose_name="Hora de Término")
+
+    subject = models.ForeignKey(
+        "Subject",
+        on_delete=models.CASCADE,
+        related_name="lessons",
+        verbose_name="Matéria"
+    )
+    class_ref = models.ForeignKey(
+        "Classroom",
+        on_delete=models.CASCADE,
+        related_name="lessons",
+        verbose_name="Turma"
+    )
+    teacher = models.ForeignKey(
+        "Teacher",
+        on_delete=models.CASCADE,
+        related_name="lessons",
+        verbose_name="Professor"
+    )
 
     class Meta:
         verbose_name = "Aula"
         verbose_name_plural = "Aulas"
 
     def __str__(self):
-        return f"{self.subject.name} - {self.date}"
-
+        return f"{self.name} - {self.subject.name}"
 
 class Exam(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name='Aula')

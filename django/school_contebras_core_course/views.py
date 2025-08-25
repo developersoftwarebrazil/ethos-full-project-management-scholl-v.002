@@ -2,8 +2,8 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import viewsets
-from .models import Teacher,Student, Course, Classroom
-from .serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ClassroomSerializer
+from .models import Lesson, Subject, Teacher,Student, Course, Classroom
+from .serializers import LessonSerializer, SubjectSerializer, TeacherSerializer,StudentSerializer, CourseSerializer, ClassroomSerializer
 
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all()
@@ -19,3 +19,12 @@ class CourseViewSet(viewsets.ModelViewSet):
 class ClassroomViewSet(viewsets.ModelViewSet):
     queryset = Classroom.objects.all()
     serializer_class = ClassroomSerializer
+
+class SubjectViewSet(viewsets.ModelViewSet):
+    queryset = Subject.objects.all()
+    serializer_class = SubjectSerializer
+
+
+class LessonViewSet(viewsets.ModelViewSet):
+    queryset = Lesson.objects.select_related("subject", "class_ref", "teacher").all()
+    serializer_class = LessonSerializer
