@@ -5,7 +5,7 @@ import uuid
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from school_contebras_core_course.models import (
-    BLOOD_TYPE_CHOICES, Announcement, Event, Exam, SchoolAdmin, Course, Grade, Subject, Teacher, Classroom, Student, Lesson,
+    BLOOD_TYPE_CHOICES, SchoolAdmin, Course, Grade, Subject, Teacher, Classroom, Student, Lesson,
 )
 from datetime import date, timedelta
 import random
@@ -171,70 +171,7 @@ class Command(BaseCommand):
                 teacher=teacher,
             )
 
+        print(f"{Lesson.objects.count()} lessons inseridas/atualizadas.")
 
-        # ========================
-        # GRADE-SUBJECT
-        # ========================
-        grade_subjects_count = 0
-        for grade in grades:
-            # Cada série terá entre 3 e 6 disciplinas
-            selected_subjects = random.sample(subjects, k=random.randint(3, 6))
-            grade.subjects.add(*selected_subjects)  # adiciona todos de uma vez
-            grade_subjects_count += len(selected_subjects)
-
-        print(f"{grade_subjects_count} grade-subject relations criadas.")
-        # ========================
-        # EXAMS
-        # ========================
-        exams = []
-        for i in range(1, 31):
-            lesson = random.choice(Lesson.objects.all())
-            exam, created = Exam.objects.get_or_create(
-            lesson=lesson,
-            title=f"Prova {i}",
-            date=timezone.now().date() + timedelta(days=i),
-            max_score=random.choice([10, 20, 30, 50, 100])
-        )
-        if created:
-            print(f"Exam criado: {exam.title}")
-            exams.append(exam)
-        print(f"{len(exams)} provas inseridas/atualizadas.")
-
-        # ========================
-        # EVENTS
-        # ========================
-        events = []
-        for i in range(1, 11):
-            classroom = random.choice(classrooms + [None])  # alguns eventos podem não estar ligados a turma
-            start = timezone.now() + timedelta(days=random.randint(1, 30))
-            end = start + timedelta(hours=2)
-            event, _ = Event.objects.get_or_create(
-                title=f"Evento {i}",
-                defaults={
-                    "description": f"Descrição do Evento {i}",
-                    "start_time": start,
-                    "end_time": end,
-                    "class_ref": classroom,
-                }
-            )
-            events.append(event)
-        print(f"{len(events)} eventos inseridos/atualizados.")
-
-        # ========================
-        # ANNOUNCEMENTS
-        # ========================
-        announcements = []
-        for i in range(1, 11):
-            classroom = random.choice(classrooms + [None])
-            ann, _ = Announcement.objects.get_or_create(
-                title=f"Aviso {i}",
-                defaults={
-                    "description": f"Descrição do Aviso {i}",
-                    "date": timezone.now() - timedelta(days=random.randint(0, 15)),
-                    "class_ref": classroom,
-                }
-            )
-            announcements.append(ann)
-        print(f"{len(announcements)} avisos inseridos/atualizados.")
 
         self.stdout.write(self.style.SUCCESS("Database seeded successfully."))

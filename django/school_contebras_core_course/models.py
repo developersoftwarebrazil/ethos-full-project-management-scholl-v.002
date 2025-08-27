@@ -82,7 +82,7 @@ class Course(models.Model):
 class Grade(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Série")
     description = models.TextField(verbose_name="Descrição da Série")
-
+    subjects = models.ManyToManyField("Subject", related_name="grades", blank=True)
     class Meta:
         verbose_name = "Série"
         verbose_name_plural = "Séries"
@@ -216,23 +216,6 @@ class RegistrationClassroom(models.Model):
         return date.today() <= due_date
 
 
-# class Lesson(models.Model):
-#     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, verbose_name='Turma')
-#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name='Disciplina')
-#     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name='Professor')
-#     date = models.DateField()
-#     start_time = models.TimeField(verbose_name='Hora de Início')
-#     end_time = models.TimeField(verbose_name='Hora de Término')
-#     topic = models.CharField(max_length=255, verbose_name='Tópico')
-
-#     class Meta:
-#         verbose_name = "Aula"
-#         verbose_name_plural = "Aulas"
-
-#     def __str__(self):
-#         return f"{self.subject.name} - {self.date}"
-
-
 class Lesson(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Aula")
     day = models.CharField(max_length=15, choices=DAY_CHOICES, verbose_name="Dia da Semana")
@@ -336,3 +319,48 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.lesson.date} - {self.status}"
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Título do Evento")
+    description = models.TextField(verbose_name="Descrição")
+    start_time = models.DateTimeField(verbose_name="Início")
+    end_time = models.DateTimeField(verbose_name="Fim")
+
+    class_ref = models.ForeignKey(
+        "Classroom",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
+        verbose_name="Turma"
+    )
+
+    class Meta:
+        verbose_name = "Evento"
+        verbose_name_plural = "Eventos"
+
+    def __str__(self):
+        return self.title
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Título do Aviso")
+    description = models.TextField(verbose_name="Descrição")
+    date = models.DateTimeField(default=timezone.now, verbose_name="Data")
+
+    class_ref = models.ForeignKey(
+        "Classroom",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="announcements",
+        verbose_name="Turma"
+    )
+
+    class Meta:
+        verbose_name = "Aviso"
+        verbose_name_plural = "Avisos"
+
+    def __str__(self):
+        return self.title
