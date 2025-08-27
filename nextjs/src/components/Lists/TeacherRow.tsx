@@ -7,6 +7,9 @@ import { role } from "@/lib/data";
 function formatSubjects(subjects: { name: string }[]) {
   return subjects?.map((s) => s.name).join(", ") || "-";
 }
+function formatClassrooms(classrooms: { name: string; course: { titleCourse: string } }[]) {
+  return classrooms?.map((c) => c.name).join(", ") || "-";
+}
 
 export default function TeacherRow({ teacher }: { teacher: Teacher }) {
   return (
@@ -31,6 +34,7 @@ export default function TeacherRow({ teacher }: { teacher: Teacher }) {
 
       <td className="hidden md:table-cell">{teacher.username}</td>
       <td className="hidden md:table-cell">{formatSubjects(teacher.teaching_subjects)}</td>
+      <td className="hidden md:table-cell">{formatClassrooms(teacher.supervised_classrooms)}</td>
       <td className="hidden md:table-cell">{teacher.phone}</td>
       <td className="hidden md:table-cell">
         {new Date(teacher.hire_date).toLocaleDateString("pt-BR")}

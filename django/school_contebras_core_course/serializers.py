@@ -6,13 +6,20 @@ class SubjectSerializer(serializers.ModelSerializer):
         model = Subject
         fields = ["id", "name", "description"]
 
+class ClassroomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Classroom
+        fields = ('id', 'name', 'grade', 'course')
+
+
 class TeacherSerializer(serializers.ModelSerializer):
     # Se quiser incluir as disciplinas como lista de nomes:
     teaching_subjects = SubjectSerializer(many=True, read_only=True)
+    supervised_classrooms = ClassroomSerializer(many=True, read_only=True)
 
     class Meta:
         model = Teacher
-        fields = ["id","username", "name","surname", "email","phone", "teaching_subjects", "hire_date"]
+        fields = ["id","username", "name","surname", "email","phone", "teaching_subjects",'supervised_classrooms', "hire_date"]
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,12 +30,6 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
-
-class ClassroomSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Classroom
-        fields = '__all__'
-
 
 class LessonSerializer(serializers.ModelSerializer):
     # Aqui aninhamos o Subject para já vir junto
