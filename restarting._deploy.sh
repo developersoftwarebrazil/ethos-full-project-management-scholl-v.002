@@ -1,45 +1,54 @@
 #!/bin/bash
-
 set -e
 
-# =======================
-# ⚙️ Utilitários
-# =======================
-kill_port() {
-    local port=$1
-    echo "🔧 Tentando liberar porta $port (se necessário)..."
+echo "🔄 Reiniciando containers existentes..."
+docker compose restart django go_app_dev nextjs
 
-    if command -v lsof >/dev/null; then
-        lsof -ti tcp:$port | xargs -r kill -9 || true
-    fi
-
-    if command -v fuser >/dev/null; then
-        fuser -k ${port}/tcp || true
-    fi
+# Espera os containers ficarem prontos
+wait_for_container() {
+    local container=$1
+    echo "⏳ Aguardando container '$container' estar pronto..."
+    while true; do
+        if docker compose exec -T "$container" echo "✅ $container pronto" &>/dev/null; then
+            echo "✅ Container '$container' está pronto!"
+            return 0
+        fi
+        sleep 2
+    done
 }
 
-kill_django_background() {
-    echo "🧹 Finalizando processos Django travados..."
-    ps aux | grep runserver | grep -v grep | awk '{print $2}' | xargs -r kill -9 || true
-}
+wait_for_container django
+wait_for_container go_app_dev
+wait_for_container nextjs
 
-# =======================
-# 🚀 Restart simples
-# =======================
+# Migrações Django
+echo "🔎 Verificando migrações pendentes..."
+MIGRATIONS_PENDING=$(docker compose exec -T django bash -c 'pipenv run python manage.py showmigrations | grep "\[ \]"' | wc -l)
 
-echo "🔪 Encerrando processos que podem estar usando as portas necessárias..."
-kill_port 8000
-kill_port 3000
-kill_port 3001
-kill_port 3002
-kill_django_background
+if [ "$MIGRATIONS_PENDING" -gt 0 ]; then
+    echo "⚒️ Aplicando migrações pendentes..."
+    docker compose exec -T django bash -c 'pipenv run python manage.py migrate'
+else
+    echo "✅ Nenhuma migração pendente"
+fi
 
-echo "🛑 Parando containers existentes..."
-docker compose down
+# Superusuário
+echo "👤 Garantindo superusuário Django..."
+docker compose exec -T django bash -c "
+pipenv run python manage.py shell -c \"
+from django.contrib.auth import get_user_model;
+User = get_user_model();
+if not User.objects.filter(email='admin@user.com').exists():
+    User.objects.create_superuser('admin1', 'admin@user.com', 'secret')
+\""
 
-echo "🔧 Subindo containers novamente..."
-docker compose up -d --build
+# Consumidores Django (background)
+echo "🎬 Reiniciando consumidores Django..."
+docker compose exec -T django bash -c "pipenv run python manage.py consumer_upload_chunks_to_external_storage" &
+docker compose exec -T django bash -c "pipenv run python manage.py consumer_register_processed_video_path" &
 
-echo "✅ Containers reiniciados!"
+sleep 3
+
 echo ""
-docker compose ps
+echo "✅ Restart concluído! Logs a seguir:"
+docker compose logs -f django go_app_dev nextjs

@@ -11,13 +11,20 @@ const Pagination = ({ currentPage, totalPages }: Props) => {
   return (
     <div className="flex items-center justify-center text-gray-500 p-4 ">
       {/* Prev */}
-      <Link
-        href={`?page=${currentPage - 1}`}
-        aria-disabled={currentPage === 1}
-        className="rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4"
-      >
-        Prev
-      </Link>
+      {currentPage > 1 ? (
+        <Link
+          href={`?page=${currentPage - 1}`}
+          aria-disabled={currentPage === 1}
+          className="rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4"
+        >
+          Prev
+        </Link>
+      ) : (
+        <span className="rounded-md bg-slate-200 text-xs font-semibold py-2 px-4">
+          Prev
+        </span>
+      )}
+
       {/* Números */}
       <div className=" flex items-center text-sm gap-2">
         <button className="px-2 rounded-sm bg-lamaSky">
@@ -35,13 +42,20 @@ const Pagination = ({ currentPage, totalPages }: Props) => {
         </button>
       </div>
       {/* Next */}
-      <Link
+      {currentPage < totalPages ? (
+        <Link
         href={`?page=${currentPage + 1}`}
         className="rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4"
         aria-disabled={currentPage === totalPages}
-        >
+      >
         Next
       </Link>
+      ):(
+        <span className="rounded-md bg-slate-200 text-xs font-semibold py-2 px-4">
+          Next
+        </span>
+      )}
+      
     </div>
   );
 };
