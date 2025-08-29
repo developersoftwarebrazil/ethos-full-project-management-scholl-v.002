@@ -5,39 +5,80 @@ import FormModel from "@/components/Forms/FormModel";
 import TeacherRow from "@/components/Lists/TeacherRow";
 import { Teacher } from "@/lib/type";
 import { role } from "@/lib/data";
+import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const columns = [
   { headers: "Info", accessor: "info" },
-  { headers: "Nome de usuário", accessor: "username", className: "hidden md:table-cell" },
-  { headers: "Matérias", accessor: "subjects", className: "hidden md:table-cell" },
-  { headers: "Turmas", accessor: "classrooms", className: "hidden md:table-cell" },
+  {
+    headers: "Nome de usuário",
+    accessor: "username",
+    className: "hidden md:table-cell",
+  },
+  {
+    headers: "Matérias",
+    accessor: "subjects",
+    className: "hidden md:table-cell",
+  },
+  {
+    headers: "Turmas",
+    accessor: "classrooms",
+    className: "hidden md:table-cell",
+  },
   { headers: "Telefone", accessor: "phone", className: "hidden lg:table-cell" },
-  { headers: "Data de Contratação", accessor: "hire_date", className: "hidden md:table-cell" },
+  {
+    headers: "Data de Contratação",
+    accessor: "hire_date",
+    className: "hidden md:table-cell",
+  },
   { headers: "Ações", accessor: "action" },
 ];
 
-async function getTeachers(): Promise<Teacher[]> {
+type TeacherResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Teacher[];
+};
+
+async function getTeachers(page: number = 1): Promise<TeacherResponse> {
   try {
-    const res = await fetch(`${API_URL}/api/teachers/`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/api/teachers/?page=${page}`, {
+      cache: "no-store",
+    });
     if (!res.ok) throw new Error("Erro ao buscar professores");
     return res.json();
   } catch (error) {
     console.error(error);
-    return [];
+    return {
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    };
   }
 }
 
-export default async function TeacherListPage() {
-  const data = await getTeachers();
+export default async function TeacherListPage({
+  searchParams,
+}: {
+  searchParams?: { page: string };
+}) {
+  const page = searchParams?.page ? parseInt(searchParams.page) : 1;
+  const { results, count } = await getTeachers(page);
+  const totalPages = Math.ceil(count / ITEM_PER_PAGE); // se PAGE_SIZE = 10
+  // const data = await getTeachers();
 
   return (
     <div className="flex-1 bg-white rounded-md p-4 m-4 mt-0">
       {/* TOP */}
       <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">Todos os professores</h1>
+        <h1 className="hidden md:block text-lg font-semibold">
+          Todos os professores
+        </h1>
         <div className="flex flex-col md:flex-row items-center w-full gap-4 md:w-auto">
           <TableSearcher />
           <div className="flex items-center gap-4 self-end">
@@ -52,16 +93,17 @@ export default async function TeacherListPage() {
         </div>
       </div>
 
-
       {/* LIST */}
       <Table
         columns={columns}
-        data={data}
-        renderRow={(teacher) => <TeacherRow key={teacher.id} teacher={teacher} />}
+        data={results}
+        renderRow={(teacher) => (
+          <TeacherRow key={teacher.id} teacher={teacher} />
+        )}
       />
 
       {/* PAGINATION */}
-      <Pagination />
+      <Pagination currentPage={page} totalPages={totalPages} />
     </div>
   );
 }

@@ -115,6 +115,7 @@ class Teacher(models.Model):
     class Meta:
         verbose_name = "Professor"
         verbose_name_plural = "Professores"
+        ordering = ['id']
 
     def __str__(self):
         return f"{self.name} {self.surname}"

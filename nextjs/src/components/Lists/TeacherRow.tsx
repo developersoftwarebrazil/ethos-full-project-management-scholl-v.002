@@ -4,10 +4,10 @@ import FormModel from "@/components/Forms/FormModel";
 import { Teacher } from "@/lib/type";
 import { role } from "@/lib/data";
 
-function formatSubjects(subjects: { name: string }[]) {
+function formatSubjects(subjects: Teacher["teaching_subjects"]) {
   return subjects?.map((s) => s.name).join(", ") || "-";
 }
-function formatClassrooms(classrooms: { name: string; course: { titleCourse: string } }[]) {
+function formatClassrooms(classrooms: Teacher["supervised_classrooms"]) {
   return classrooms?.map((c) => c.name).join(", ") || "-";
 }
 

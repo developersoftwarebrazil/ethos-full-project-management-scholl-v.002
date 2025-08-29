@@ -158,3 +158,8 @@ MEDIA_ROOT = '/media/uploads/'
 
 RABBITMQ_URL = os.environ.get('RABBITMQ_URL')
 ASSETS_URL = os.environ.get('ASSETS_URL')
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,  # quantidade por página
+}

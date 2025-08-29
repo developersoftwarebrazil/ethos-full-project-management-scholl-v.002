@@ -6,7 +6,7 @@ from .models import Lesson, Subject, Teacher,Student, Course, Classroom
 from .serializers import LessonSerializer, SubjectSerializer, TeacherSerializer,StudentSerializer, CourseSerializer, ClassroomSerializer
 
 class TeacherViewSet(viewsets.ModelViewSet):
-    queryset = Teacher.objects.all()
+    queryset = Teacher.objects.all().order_by('id')
     serializer_class = TeacherSerializer
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()

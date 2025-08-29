@@ -18,13 +18,19 @@ export type Classroom = {
 export type Teacher = {
   id?: number | string;
   teacherId: number | string;
-  name: string;
   username: string;
+  name: string;
+  surname: string;
   email: string;
   phone: string;
+  hire_date: string;
+  photo?: string;
   teaching_subjects: TeachingSubject[];
   supervised_classrooms: Classroom[];
-  classes: string[];
-  photo?: string;
-  hire_date: string;
+};
+export type TeacherResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Teacher[];
 };
