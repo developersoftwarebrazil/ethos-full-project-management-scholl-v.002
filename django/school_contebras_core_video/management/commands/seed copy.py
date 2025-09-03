@@ -1,61 +1,42 @@
 # school_contebras_core_course/management/commands/seed.py
-import random
+import datetime
 import uuid
-from datetime import date, timedelta
 
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-
 from school_contebras_core_course.models import (
-    BLOOD_TYPE_CHOICES,
-    Announcement,
-    Event,
-    Exam,
-    SchoolAdmin,
-    Course,
-    Grade,
-    Subject,
-    Teacher,
-    Classroom,
-    Student,
-    Lesson,
+    BLOOD_TYPE_CHOICES, Announcement, Event, Exam, SchoolAdmin, Course, Grade, Subject, Teacher, Classroom, Student, Lesson,
 )
-
-User = get_user_model()
-
+from datetime import date, timedelta
+import random
 
 class Command(BaseCommand):
-    help = "Seed initial data for the database"
+    help = 'Seed initial data for the database'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("🌱 Seeding database...")
+        self.stdout.write("Seeding database...")
 
         # ========================
         # ADMIN
         # ========================
         admins_data = [
-            {"username": "admin1", "first_name": "Admin", "last_name": "One", "email": "admin1@example.com"},
-            {"username": "admin2", "first_name": "Admin", "last_name": "Two", "email": "admin2@example.com"},
+            {"username": "admin1", "name": "Admin 1", "email": "admin1@example.com"},
+            {"username": "admin2", "name": "Admin 2", "email": "admin2@example.com"},
         ]
 
         for data in admins_data:
-            user, _ = User.objects.get_or_create(
-                username=data["username"],
+            obj, created = SchoolAdmin.objects.get_or_create(
+                email=data["email"],
                 defaults={
-                    "first_name": data["first_name"],
-                    "last_name": data["last_name"],
-                    "email": data["email"],
-                    "is_staff": True,
-                    "is_superuser": True,
-                },
+                    "id": str(uuid.uuid4()),
+                    "username": data["username"],
+                    "name": data["name"]
+                }
             )
-            admin, created = SchoolAdmin.objects.get_or_create(user=user)
             if created:
-                self.stdout.write(self.style.SUCCESS(f"✅ Admin criado: {user.username}"))
+                self.stdout.write(self.style.SUCCESS(f"Admin criado: {obj.username}"))
             else:
-                self.stdout.write(self.style.WARNING(f"⚠️ Admin já existe: {user.username}"))
-
+                self.stdout.write(self.style.WARNING(f"Admin já existe: {obj.username}"))
         # ========================
         # GRADE
         # ========================
@@ -80,58 +61,47 @@ class Command(BaseCommand):
         # SUBJECT
         # ========================
         subject_names = [
-            "Matemática",
-            "Ciências",
-            "Inglês",
-            "História",
-            "Geografia",
-            "Física",
-            "Química",
-            "Biologia",
-            "Computação",
-            "Arte",
+            "Matemática", "Ciências", "Inglês", "História", "Geografia",
+            "Física", "Química", "Biologia", "Computação", "Arte"
         ]
         subjects = []
         for name in subject_names:
-            subject, _ = Subject.objects.get_or_create(
-                name=name, defaults={"description": f"Descrição de {name}"}
-            )
+            subject, _ = Subject.objects.get_or_create(name=name, defaults={"description": f"Descrição de {name}"})
             subjects.append(subject)
 
         # ========================
         # TEACHER
         # ========================
+      
         teachers = []
+
+        # blood_types = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
         blood_types = [choice[0] for choice in BLOOD_TYPE_CHOICES]
-        sex_choices = ["MALE", "FEMALE"]
+        sex_choices = ['MALE', 'FEMALE', 'OTHER']
 
         for i in range(1, 16):
-            user, _ = User.objects.get_or_create(
-                username=f"teacher{i}",
-                defaults={
-                    "first_name": f"TName{i}",
-                    "last_name": f"TSurname{i}",
-                    "email": f"teacher{i}@example.com",
-                },
-            )
-
             teacher, _ = Teacher.objects.get_or_create(
-                user=user,
-                defaults={
-                    "hire_date": date.today() - timedelta(days=365 * 5),
-                    "birthday": date.today() - timedelta(days=365 * 30 + random.randint(0, 365)),
-                    "bloodType": random.choice(blood_types),
-                    "sex": random.choice(sex_choices),
-                    "createdAt": timezone.now(),
-                },
-            )
+            email=f"teacher{i}@example.com",
+            defaults={
+            "username": f"teacher{i}",
+            "name": f"TName{i}",
+            "surname": f"TSurname{i}",
+            "password_hash": "hash_teacher",
+            "hire_date": date.today() - timedelta(days=365*5),
+            "birthday": date.today() - timedelta(days=365*30 + random.randint(0, 365)),  # ~30 anos
+            "phone": f"123-456-78{i:02d}",
+            "address": f"Rua {i}, Bairro Exemplo, Cidade X",
+            "bloodType": random.choice(blood_types),
+            "sex": random.choice(sex_choices),
+            "createdAt": timezone.now(),
+            "img": None,  # ou algum valor padrão se desejar
+        }
+    )
+    # Assign random subjects (pode ser mais de um)
+        teacher.teaching_subjects.set(random.sample(subjects, k=min(len(subjects), random.randint(1, 5))))
+        teachers.append(teacher)
 
-            teacher.teaching_subjects.set(
-                random.sample(subjects, k=min(len(subjects), random.randint(1, 5)))
-            )
-            teachers.append(teacher)
-
-        self.stdout.write(self.style.SUCCESS(f"✅ {len(teachers)} professores criados."))
+        print(f"{len(teachers)} teachers seeded successfully!")
 
         # ========================
         # CLASSROOM
@@ -142,7 +112,7 @@ class Command(BaseCommand):
                 name=f"{i}A",
                 grade=grade,
                 course=random.choice(courses),
-                supervisor=random.choice(teachers),
+                supervisor=random.choice(teachers)
             )
             classrooms.append(classroom)
 
@@ -150,30 +120,32 @@ class Command(BaseCommand):
         # STUDENT
         # ========================
         students = []
+        grades = list(Grade.objects.all())
+        classrooms = list(Classroom.objects.all())
+        blood_types = [choice[0] for choice in BLOOD_TYPE_CHOICES]
+
         for i in range(1, 51):
-            user, _ = User.objects.get_or_create(
-                username=f"student{i}",
-                defaults={
-                    "first_name": f"SName{i}",
-                    "last_name": f"SSurname{i}",
-                    "email": f"student{i}@example.com",
-                },
-            )
-
             student, _ = Student.objects.get_or_create(
-                user=user,
-                defaults={
-                    "sex": "MALE" if i % 2 == 0 else "FEMALE",
-                    "bloodType": random.choice(blood_types),
-                    "birthday": date.today() - timedelta(days=365 * 10 + i),
-                    "grade": random.choice(grades),
-                    "classroom": random.choice(classrooms),
-                    "createdAt": timezone.now(),
-                },
-            )
-            students.append(student)
-
-        self.stdout.write(self.style.SUCCESS(f"✅ {len(students)} estudantes criados."))
+            username=f"student{i}",
+            defaults={
+                "id": str(uuid.uuid4()),  # gera um UUID para o campo id
+                "name": f"SName{i}",
+                "surname": f"SSurname{i}",
+                "email": f"student{i}@example.com",
+                "phone": f"987-654-32{i:02d}",
+                "sex": "MALE" if i % 2 == 0 else "FEMALE",
+                "bloodType": random.choice(blood_types),
+                "address": f"Rua Exemplo {i}, Cidade XYZ",
+                "birthday": date.today() - timedelta(days=365*10 + i),  # pequenas variações
+                "grade": random.choice(grades),
+                "classroom": random.choice(classrooms),
+                "createdAt": timezone.now(),
+                "img": None  # ou um caminho default se preferir
+            }
+        )
+        students.append(student)
+    
+        print(f"{len(students)} estudantes inseridos/atualizados.")
 
         # ========================
         # LESSON
@@ -182,9 +154,11 @@ class Command(BaseCommand):
 
         for i in range(1, 31):
             subject = random.choice(subjects)
+            
+            # Escolhe um professor que leciona essa matéria
             eligible_teachers = list(subject.teachers.all())
             if not eligible_teachers:
-                continue
+                continue  # pula se nenhum professor disponível
             teacher = random.choice(eligible_teachers)
 
             Lesson.objects.get_or_create(
@@ -197,13 +171,18 @@ class Command(BaseCommand):
                 teacher=teacher,
             )
 
+
         # ========================
         # GRADE-SUBJECT
         # ========================
+        grade_subjects_count = 0
         for grade in grades:
+            # Cada série terá entre 3 e 6 disciplinas
             selected_subjects = random.sample(subjects, k=random.randint(3, 6))
-            grade.subjects.add(*selected_subjects)
+            grade.subjects.add(*selected_subjects)  # adiciona todos de uma vez
+            grade_subjects_count += len(selected_subjects)
 
+        print(f"{grade_subjects_count} grade-subject relations criadas.")
         # ========================
         # EXAMS
         # ========================
@@ -211,22 +190,22 @@ class Command(BaseCommand):
         for i in range(1, 31):
             lesson = random.choice(Lesson.objects.all())
             exam, created = Exam.objects.get_or_create(
-                lesson=lesson,
-                title=f"Prova {i}",
-                date=timezone.now().date() + timedelta(days=i),
-                max_score=random.choice([10, 20, 30, 50, 100]),
-            )
-            if created:
-                exams.append(exam)
-
-        self.stdout.write(self.style.SUCCESS(f"✅ {len(exams)} provas criadas."))
+            lesson=lesson,
+            title=f"Prova {i}",
+            date=timezone.now().date() + timedelta(days=i),
+            max_score=random.choice([10, 20, 30, 50, 100])
+        )
+        if created:
+            print(f"Exam criado: {exam.title}")
+            exams.append(exam)
+        print(f"{len(exams)} provas inseridas/atualizadas.")
 
         # ========================
         # EVENTS
         # ========================
         events = []
         for i in range(1, 11):
-            classroom = random.choice(classrooms + [None])
+            classroom = random.choice(classrooms + [None])  # alguns eventos podem não estar ligados a turma
             start = timezone.now() + timedelta(days=random.randint(1, 30))
             end = start + timedelta(hours=2)
             event, _ = Event.objects.get_or_create(
@@ -236,11 +215,10 @@ class Command(BaseCommand):
                     "start_time": start,
                     "end_time": end,
                     "class_ref": classroom,
-                },
+                }
             )
             events.append(event)
-
-        self.stdout.write(self.style.SUCCESS(f"✅ {len(events)} eventos criados."))
+        print(f"{len(events)} eventos inseridos/atualizados.")
 
         # ========================
         # ANNOUNCEMENTS
@@ -254,10 +232,9 @@ class Command(BaseCommand):
                     "description": f"Descrição do Aviso {i}",
                     "date": timezone.now() - timedelta(days=random.randint(0, 15)),
                     "class_ref": classroom,
-                },
+                }
             )
             announcements.append(ann)
+        print(f"{len(announcements)} avisos inseridos/atualizados.")
 
-        self.stdout.write(self.style.SUCCESS(f"✅ {len(announcements)} avisos criados."))
-
-        self.stdout.write(self.style.SUCCESS("🎉 Database seeded successfully!"))
+        self.stdout.write(self.style.SUCCESS("Database seeded successfully."))

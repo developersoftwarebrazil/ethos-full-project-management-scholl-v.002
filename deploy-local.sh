@@ -119,10 +119,15 @@ docker compose exec -T django bash -c "
 pipenv run python manage.py shell -c \"
 from django.contrib.auth import get_user_model;
 User = get_user_model();
-if not User.objects.filter(email='admin@user.com').exists():
-    User.objects.create_superuser('admin1', 'admin@user.com', 'secret')
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser(
+        username='admin',
+        email='admin@user.com',
+        password='secret'
+    )
+else:
+    print('✅ Superusuário já existe, pulando...')
 \""
-
 wait_for_container go_app_dev
 wait_for_container nextjs
 

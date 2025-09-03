@@ -2,6 +2,7 @@ from datetime import date, timedelta
 import hashlib
 import os
 import time
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.text import get_valid_filename
@@ -22,6 +23,7 @@ DAY_CHOICES = [
     ('THURSDAY', 'Quinta-feira'),
     ('FRIDAY', 'Sexta-feira'),
 ]
+
 BLOOD_TYPE_CHOICES = [
     ('A+', 'A+'),
     ('A-', 'A-'),
@@ -50,22 +52,26 @@ def file_name(instance, filename):
 # ===========================
 
 
-
-# ===========================
 # ADMINS ok
+# ===========================
 
 class SchoolAdmin(models.Model):
-    id = models.CharField(max_length=255, primary_key=True,editable=False)
-    username = models.CharField(max_length=150, unique=True, verbose_name="Nome de usuário")
-    name = models.CharField(max_length=150, verbose_name="Nome do Administrador")
-    email = models.EmailField(max_length=255, unique=True, verbose_name="E-mail")
+   # Também conectado ao User
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="admin_profile"
+    )
 
+    # Campos extras podem ser adicionados futuramente
+    created_at = models.DateTimeField(default=timezone.now)
     class Meta:
         verbose_name = "Administrador"
         verbose_name_plural = "Administradores"
 
     def __str__(self):
-        return self.username
+        return self.user.username
+
 
 class Course(models.Model):
     titleCourse = models.CharField(max_length=150, verbose_name="Título do curso")
@@ -78,7 +84,6 @@ class Course(models.Model):
     def __str__(self):
         return self.titleCourse
 
-
 class Grade(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Série")
     description = models.TextField(verbose_name="Descrição da Série")
@@ -90,23 +95,23 @@ class Grade(models.Model):
     def __str__(self):
         return self.name
 
-
-
 # ===========================
 # Teacher Model ok
 # ===========================
 class Teacher(models.Model):
-    username = models.CharField(max_length=50, unique=True, verbose_name="Nome de Usuário")
-    name = models.CharField(max_length=150, verbose_name="Nome")
-    surname = models.CharField(max_length=150, verbose_name="Sobrenome")
-    email = models.EmailField(unique=True, null=True, blank=True, verbose_name="E-mail")
-    phone = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="Telefone")
-    address = models.CharField(max_length=255, verbose_name="Endereço")
-    img = models.ImageField(upload_to='teachers/', null=True, blank=True, verbose_name="Foto")
+    # Também ligado a um User (auth)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="teacher_profile"
+    )
+
+     # Dados profissionais
+    hire_date = models.DateField(verbose_name="Data de Contratação")
+
+    # Dados pessoais)
     bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, verbose_name="Tipo Sanguíneo")
     sex = models.CharField(max_length=10, choices=SEX_CHOICES, verbose_name="Sexo")
-    password_hash = models.CharField(max_length=255, verbose_name="Senha (Hash)")
-    hire_date = models.DateField(verbose_name="Data de Contratação")
     birthday = models.DateField(verbose_name="Data de Nascimento")
     createdAt = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
     
@@ -118,9 +123,8 @@ class Teacher(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return f"{self.name} {self.surname}"
+     return f"{self.user.first_name} {self.user.last_name}"
 
-from django.db import models
 
 class Subject(models.Model):
     name = models.CharField(
@@ -165,23 +169,23 @@ class Classroom(models.Model):
         return f'Turma {self.name} - {self.course.titleCourse}'
 
 
-
 class Student(models.Model):
-    id = models.CharField(primary_key=True, max_length=50, editable=False)  # compatível com Prisma String @id
-    username = models.CharField(max_length=100, unique=True, verbose_name='Nome de usuário')
-    name = models.CharField(max_length=150, verbose_name='Nome')
-    surname = models.CharField(max_length=100, verbose_name='Sobrenome')
-    email = models.EmailField(max_length=100, unique=True, null=True, blank=True, verbose_name='E-mail')
-    phone = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name='Telefone')
-    address = models.CharField(max_length=255, null=True, blank=True, verbose_name='Endereço')
-    img = models.ImageField(upload_to=file_name, null=True, blank=True, verbose_name='Foto')
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="student_profile"
+    )
+
+    # Dados pessoais   
     bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, verbose_name='Tipo Sanguíneo')
     sex = models.CharField(max_length=10, choices=SEX_CHOICES, verbose_name='Sexo')
     birthday = models.DateField(verbose_name='Data de Nascimento')
     createdAt = models.DateTimeField(default=timezone.now, verbose_name='Criado em')
     
-    classroom = models.ForeignKey("Classroom", on_delete=models.SET_NULL, null=True, related_name='students', verbose_name='Turma')
-    grade = models.ForeignKey("Grade", on_delete=models.SET_NULL, null=True, related_name='students', verbose_name='Série')
+     # Relacionamentos acadêmicos
+    classroom = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, related_name="students", verbose_name='Turma')
+    grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True, related_name="students", verbose_name='Série')
+
 
     # Relacionamentos (equivalentes a Attendance[] e Result[])
     # Student -> Attendance (One-to-Many)
@@ -194,7 +198,8 @@ class Student(models.Model):
         verbose_name_plural = "Alunos"
 
     def __str__(self):
-        return f"{self.name} {self.surname}"
+        return f"{self.user.first_name} {self.user.last_name}"
+
 
 class RegistrationClassroom(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -208,7 +213,8 @@ class RegistrationClassroom(models.Model):
         verbose_name_plural = "Matrículas"
 
     def __str__(self):
-        return f"{self.student.name} - {self.classroom.name}"
+        return f"{self.student.user.first_name} - {self.classroom.name}"
+
 
     def can_access(self, video):
         if not self.last_monthly_date:
@@ -290,7 +296,7 @@ class ExamResult(models.Model):
         verbose_name_plural = "Notas de Provas"
 
     def __str__(self):
-        return f"{self.student.name} - {self.exam.title}"
+        return f"{self.student.user.first_name} - {self.exam.title}"
 
 
 class AssignmentResult(models.Model):
@@ -305,7 +311,7 @@ class AssignmentResult(models.Model):
         verbose_name_plural = "Resultados das Atividades"
 
     def __str__(self):
-        return f"{self.student.name} - {self.assignment.title}"
+        return f"{self.student.user.first_name} - {self.assignment.title}"
 
 
 class Attendance(models.Model):
@@ -319,8 +325,7 @@ class Attendance(models.Model):
         verbose_name_plural = "Frequências"
 
     def __str__(self):
-        return f"{self.student.name} - {self.lesson.date} - {self.status}"
-
+        return f"{self.student.user.first_name} - {self.lesson.name} - {self.status}"
 
 class Event(models.Model):
     title = models.CharField(max_length=255, verbose_name="Título do Evento")
@@ -343,7 +348,6 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class Announcement(models.Model):
     title = models.CharField(max_length=255, verbose_name="Título do Aviso")
