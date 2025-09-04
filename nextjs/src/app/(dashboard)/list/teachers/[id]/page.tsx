@@ -4,141 +4,119 @@ import BigCalendar from "@/components/Events/BigCalendar";
 import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
-import { use } from "react";
 
-const SingleTeacherPage = () => {
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+type Teacher = {
+  id: number;
+  user: {
+    first_name: string;
+    last_name: string;
+    username: string;
+    email: string;
+    phone: string | null;
+    address: string | null;
+    img: string | null;
+  };
+  hire_date: string;
+  sex: string;
+  bloodType: string;
+  birthday: string;
+  teaching_subjects: { name: string }[];
+  supervised_classrooms: { name: string }[];
+};
+
+export default async function SingleTeacherPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const teacher: Teacher | null = await fetch(`${API_URL}/api/teachers/${params.id}/`, {
+    cache: "no-store",
+  }).then((res) => (res.ok ? res.json() : null));
+
+  if (!teacher) return <p>Professor não encontrado</p>;
+
   return (
-    <div className="flex flex-col  p-4 gap-4 xl:flex-row ">
-      {/* LEFT  */}
+    <div className="flex flex-col p-4 gap-4 xl:flex-row">
+      {/* LEFT */}
       <div className="w-full xl:w-2/3">
-        {/* TOP  */}
-        <div className="flex flex-col lg:flex-row gap-4">
-          {/* USER INFO CARD  */}
-
-          <div className="flex flex-col flex-1 sm:flex-row items-center sm:items-start bg-lamaSky rounded-md p-4 gap-4 text-center sm:text-left ">
-            {/* <div className="w-1/3"> */}
-            <div className="w-24 h-24 sm:w-36 sm:h-36 ">
-              <Image
-                src="https://images.pexels.com/photos/2888150/pexels-photo-2888150.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt=""
-                width={144}
-                height={144}
-                className="rounded-full w-24 h-24 object-cover sm:w-36 sm:h-36"
-              />
-            </div>
-
-            <div className="flex flex-col justify-between w-1/2 lg:w-1/2 gap-4 ">
-              <div className="flex  items-center gsp-4">
-                <h1 className="text-xl font-semibold">Leonard Burran</h1>
-                <FormModel
-                  table="teacher"
-                  type="update"
-                  data={{
-                    id: "1",
-                    username: "leonardburran",
-                    email: "leonard.burran@example.com",
-                    password: "password123",
-                    firstName: "Leonard",
-                    lastName: "Burran",
-                    phone: "19 99999-9999",
-                    address: "123 Main St, City, Country",
-                    bloodType: "A+",
-                    birthday: "1985-01-01",
-                    sex: "male",
-                    description:
-                      "History teacher and arts. He loves modern arts.",
-                    img: "https://images.pexels.com/photos/2888150/pexels-photo-2888150.jpeg?auto=compress&cs=tinysrgb&w=1200",
-                  }}
-                />
-              </div>
-              <p className="text-sm text-gray-500">
-                History teacher and arts. He loves modern arts.
-              </p>
-              <div className="flex flex-wrap  items-center justify-between text-xs font-medium  gap-4">
-                <div className="w-full md:w-1/3 flex items-center gap-2">
-                  <Image src="/blood.png" alt="" width={14} height={14} />
-                  <span className="text-nowrap">A+</span>
-                </div>
-                <div className="w-full md:w-1/3 flex items-center gap-2">
-                  <Image src="/date.png" alt="" width={14} height={14} />
-                  <span className="text-nowrap">January 2025</span>
-                </div>
-                <div className="w-full md:w-1/3 flex items-center gap-2">
-                  <Image src="/mail.png" alt="" width={14} height={14} />
-                  <span className="text-nowrap">contact@user.com</span>
-                </div>
-                <div className="w-full md:w-1/3 flex items-center gap-2">
-                  <Image src="/phone.png" alt="" width={14} height={14} />
-                  <span className="text-nowrap">19 99999-9999</span>
-                </div>
-              </div>
-            </div>
+        {/* USER INFO CARD */}
+        <div className="flex flex-col flex-1 sm:flex-row items-center sm:items-start bg-lamaSky rounded-md p-4 gap-4 text-center sm:text-left">
+          <div className="w-24 h-24 sm:w-36 sm:h-36">
+            <Image
+              src={teacher.user.img || "/default-user.png"}
+              alt={teacher.user.username}
+              width={144}
+              height={144}
+              className="rounded-full w-24 h-24 object-cover sm:w-36 sm:h-36"
+            />
           </div>
-          {/* SMALL CARDS  */}
-          <div className="flex flex-1 flex-wrap justify-between gap-4">
-            {/* CARD  */}
-            <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
-              <Image
-                src="/singleAttendance.png"
-                alt=""
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              <div className="">
-                <h1 className="text-xl font-semibold">90%</h1>
-                <span className="text-sm text-gray-400">Attendance</span>
-              </div>
+
+          <div className="flex flex-col justify-between w-1/2 lg:w-1/2 gap-4">
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-semibold">
+                {teacher.user.first_name} {teacher.user.last_name}
+              </h1>
+              <FormModel table="teacher" type="update" data={teacher} />
             </div>
-            <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
-              <Image
-                src="/singleBranch.png"
-                alt=""
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              <div className="">
-                <h1 className="text-xl font-semibold">2</h1>
-                <span className="text-sm text-gray-400">Branches</span>
+
+            <div className="flex flex-wrap items-center justify-between text-xs font-medium gap-4">
+              <div className="w-full md:w-1/3 flex items-center gap-2">
+                <Image src="/blood.png" alt="" width={14} height={14} />
+                <span>{teacher.bloodType}</span>
               </div>
-            </div>
-            <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
-              <Image
-                src="/singleLesson.png"
-                alt=""
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              <div className="">
-                <h1 className="text-xl font-semibold">6</h1>
-                <span className="text-sm text-gray-400">Lessons</span>
+              <div className="w-full md:w-1/3 flex items-center gap-2">
+                <Image src="/date.png" alt="" width={14} height={14} />
+                <span>{new Date(teacher.birthday).toLocaleDateString()}</span>
               </div>
-            </div>
-            <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%] xl:w-[45%] 2xl:w-[48%]">
-              <Image
-                src="/singleClass.png"
-                alt=""
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
-              <div className="">
-                <h1 className="text-xl font-semibold">90%</h1>
-                <span className="text-sm text-gray-400">Classes</span>
+              <div className="w-full md:w-1/3 flex items-center gap-2">
+                <Image src="/mail.png" alt="" width={14} height={14} />
+                <span>{teacher.user.email}</span>
+              </div>
+              <div className="w-full md:w-1/3 flex items-center gap-2">
+                <Image src="/phone.png" alt="" width={14} height={14} />
+                <span>{teacher.user.phone || "-"}</span>
               </div>
             </div>
           </div>
         </div>
-        {/* BOTTOM  */}
+
+        {/* SMALL CARDS */}
+        <div className="flex flex-1 flex-wrap justify-between gap-4 mt-4">
+          <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%]">
+            <Image src="/singleLesson.png" alt="" width={24} height={24} />
+            <div>
+              <h1 className="text-xl font-semibold">
+            
+                {(teacher.teaching_subjects || []).length}
+
+              </h1>
+              <span className="text-sm text-gray-400">Matérias</span>
+            </div>
+          </div>
+          <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%]">
+            <Image src="/singleClass.png" alt="" width={24} height={24} />
+            <div>
+              <h1 className="text-xl font-semibold">
+              
+                {(teacher.supervised_classrooms || []).length}
+
+              </h1>
+              <span className="text-sm text-gray-400">Turmas</span>
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM */}
         <div className="bg-white rounded-md h-[800px] mt-4">
           <h1>Teacher&apos;s Schedule</h1>
           <BigCalendar data={[]} />
         </div>
       </div>
-      {/* RIGHT  */}
-      <div className="flex flex-col w-full  xl:w-1/3 gap-4">
+
+      {/* RIGHT */}
+      <div className="flex flex-col w-full xl:w-1/3 gap-4">
         <div className="bg-white rounded-md p-4">
           <h1 className="text-xl font-semibold">Shortcuts</h1>
           <div className="flex flex-wrap text-xs text-gray-500 gap-4 mt-4">
@@ -164,6 +142,4 @@ const SingleTeacherPage = () => {
       </div>
     </div>
   );
-};
-
-export default SingleTeacherPage;
+}

@@ -1,95 +1,144 @@
 from rest_framework import serializers
 from .models import Lesson, Subject, Teacher, Student, Course, Classroom
+from school_contebras_core_accounts.models import User
+
 
 # ===============================
-# Subject
+# User
 # ===============================
-class SubjectSerializer(serializers.ModelSerializer):
-    """Serializer para disciplina (Subject)."""
-
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Subject
-        fields = ["id", "name", "description"]
-
-
-# ===============================
-# Classroom
-# ===============================
-class ClassroomSerializer(serializers.ModelSerializer):
-    """Serializer para sala de aula (Classroom)."""
-
-    class Meta:
-        model = Classroom
-        fields = ("id", "name", "grade", "course")
+        model = User
+        fields = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "phone",
+            "address",
+            "img",
+        ]
 
 
 # ===============================
 # Teacher
 # ===============================
 class TeacherSerializer(serializers.ModelSerializer):
-    """
-    Serializer para professor.
-    Inclui disciplinas ministradas e turmas supervisionadas.
-    """
-    teaching_subjects = SubjectSerializer(many=True, read_only=True)
-    supervised_classrooms = ClassroomSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Teacher
         fields = [
             "id",
-            "username",
-            "name",
-            "surname",
-            "email",
-            "phone",
+            "user",
             "hire_date",
-            "teaching_subjects",      # disciplinas que leciona
-            "supervised_classrooms",  # turmas supervisionadas
+            "sex",
+            "bloodType",
+            "birthday",
+            "createdAt",
         ]
-
-
-# ===============================
-# Course
-# ===============================
-class CourseSerializer(serializers.ModelSerializer):
-    """Serializer para curso (Course)."""
-
-    class Meta:
-        model = Course
-        fields = "__all__"
 
 
 # ===============================
 # Student
 # ===============================
 class StudentSerializer(serializers.ModelSerializer):
-    """Serializer para aluno (Student)."""
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Student
-        fields = "__all__"
+        fields = [
+            "id",
+            "user",
+            "sex",
+            "bloodType",
+            "birthday",
+            "createdAt",
+            "classroom",
+            "grade",
+        ]
+
+
+# ===============================
+# Subject
+# ===============================
+class SubjectSerializer(serializers.ModelSerializer):
+    teachers = TeacherSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Subject
+        fields = [
+            "id",
+            "name",
+            "description",
+            "teachers"
+        ]
+
+
+# ===============================
+# Classroom (com supervisor e alunos)
+# ===============================
+class ClassroomSerializer(serializers.ModelSerializer):
+    supervisor = TeacherSerializer(read_only=True)
+    students = StudentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Classroom
+        fields = [
+            "id",
+            "name",
+            "grade",
+            "supervisor",
+            "students"
+        ]
 
 
 # ===============================
 # Lesson
 # ===============================
 class LessonSerializer(serializers.ModelSerializer):
-    """
-    Serializer para aula (Lesson).
-    Inclui a disciplina (Subject) de forma aninhada.
-    """
     subject = SubjectSerializer(read_only=True)
+    class_ref = ClassroomSerializer(read_only=True)
+    teacher = TeacherSerializer(read_only=True)
 
     class Meta:
         model = Lesson
+        fields = "__all__"
+
+
+# ===============================
+# Course COMPLETO
+# ===============================
+class CourseSerializer(serializers.ModelSerializer):
+    classrooms = ClassroomSerializer(many=True, read_only=True)
+    
+    # Todas as disciplinas que fazem parte das turmas deste curso
+    subjects = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Course
         fields = [
             "id",
-            "name",
-            "day",
-            "start_time",
-            "end_time",
-            "subject",
-            "class_ref",
-            "teacher",
+            "titleCourse",
+            "description",
+            "classrooms",
+            "subjects",
         ]
+
+    def get_subjects(self, obj):
+        """
+        Retorna todas as disciplinas relacionadas às turmas do curso,
+        com professores que lecionam cada disciplina.
+        """
+        # Pega todas as turmas do curso
+        classrooms = obj.classrooms.all()
+        # Pega todas as disciplinas dessas turmas
+        subject_ids = set()
+        for classroom in classrooms:
+            for lesson in classroom.lessons.all():
+                subject_ids.add(lesson.subject.id)
+
+        subjects = Subject.objects.filter(id__in=subject_ids).distinct()
+        return SubjectSerializer(subjects, many=True, read_only=True).data

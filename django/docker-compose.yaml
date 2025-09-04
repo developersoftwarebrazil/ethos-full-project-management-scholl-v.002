@@ -19,7 +19,7 @@ services:
         pipenv install &&
         pipenv run python manage.py makemigrations &&
         pipenv run python manage.py migrate &&
-        pipenv run python manage.py seed &&
+        # pipenv run python manage.py seed &&
         pipenv run python manage.py createsuperuser --noinput --username admin1 --email admin@user.com || true &&
         pipenv run python manage.py runserver 0.0.0.0:8000
       "

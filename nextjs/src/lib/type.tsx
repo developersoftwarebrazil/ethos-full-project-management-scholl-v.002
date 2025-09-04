@@ -16,18 +16,27 @@ export type Classroom = {
 };
 
 export type Teacher = {
-  id?: number | string;
-  teacherId: number | string;
-  username: string;
-  name: string;
-  surname: string;
-  email: string;
-  phone: string;
+  id: number;
+  user: {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: string;
+    phone: string | null;
+    address: string | null;
+    img: string | null;
+  };
   hire_date: string;
-  photo?: string;
-  teaching_subjects: TeachingSubject[];
-  supervised_classrooms: Classroom[];
+  sex: string;
+  bloodType: string;
+  birthday: string;
+  createdAt: string;
+  teaching_subjects?: { id: number; name: string }[];
+  supervised_classrooms?: { id: number; name: string }[];
 };
+
 export type TeacherResponse = {
   count: number;
   next: string | null;
