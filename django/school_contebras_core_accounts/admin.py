@@ -1,15 +1,21 @@
-from django.contrib import admin
+
 
 # Register your models here.
 # school_contebras_core_accounts/admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import User, Role
+
+@admin.register(Role)
+class RoleAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "description")
+    search_fields = ("name",)
 
 @admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    list_display = ("username", "email", "role", "is_staff", "is_superuser")
-    list_filter = ("role", "is_staff", "is_superuser")
-    fieldsets = UserAdmin.fieldsets + (
-        ("Funções", {"fields": ("role",)}),  # 👈 adiciona o campo "role" na edição
-    )
+class CustomUserAdmin(admin.ModelAdmin):
+    list_display = ("username", "email", "get_roles")
+    filter_horizontal = ("roles",)
+
+    def get_roles(self, obj):
+        return ", ".join([role.name for role in obj.roles.all()])
+    get_roles.short_description = "Roles"

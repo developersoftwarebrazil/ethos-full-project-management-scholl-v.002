@@ -7,6 +7,7 @@ from school_contebras_core_accounts.models import User
 # User
 # ===============================
 class UserSerializer(serializers.ModelSerializer):
+    roles = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = [
@@ -15,12 +16,13 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "role",
+            "roles",
             "phone",
             "address",
             "img",
         ]
-
+    def get_roles(self, obj):
+        return [role.name for role in obj.roles.all()]
 
 # ===============================
 # Teacher

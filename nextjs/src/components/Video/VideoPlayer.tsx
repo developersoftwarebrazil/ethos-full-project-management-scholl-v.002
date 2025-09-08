@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+// import * as shaka from "shaka-player/dist/shaka-player.compiled";
 import * as shaka from "shaka-player/dist/shaka-player.compiled";
 
 export type VideoPlayerProps = {

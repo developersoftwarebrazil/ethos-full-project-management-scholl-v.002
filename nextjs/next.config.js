@@ -9,6 +9,14 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "host.docker.internal",
+        port: "9000",
+        pathname: "/media/uploads/thumbnails/**",
+      },
+      {
+        protocol: "http",
+        hostname: "host.docker.internal",
+        port: "9000",
+        pathname: "/media/uploads/users/**",
       },
     ],
   },
