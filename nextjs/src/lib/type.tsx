@@ -23,10 +23,11 @@ export type Teacher = {
     first_name: string;
     last_name: string;
     email: string;
-    role: string;
+    roles: string[]; // <- array, não string
     phone: string | null;
     address: string | null;
     img: string | null;
+    subjects?: string[]; // <- opcional, conforme API
   };
   hire_date: string;
   sex: string;

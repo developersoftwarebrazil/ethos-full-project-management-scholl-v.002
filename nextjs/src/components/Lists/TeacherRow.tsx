@@ -33,7 +33,8 @@ export default function TeacherRow({ teacher }: { teacher: Teacher }) {
       </td>
 
       <td className="hidden md:table-cell">{teacher.user.username}</td>
-      <td className="hidden md:table-cell">{formatSubjects(teacher.teaching_subjects)}</td>
+      {/* <td className="hidden md:table-cell">{formatSubjects(teacher.teaching_subjects)}</td> */}
+      <td className="hidden md:table-cell">{teacher.user.subjects?.join(", ")|| "-"}</td>
       <td className="hidden md:table-cell">{formatClassrooms(teacher.supervised_classrooms)}</td>
       <td className="hidden md:table-cell">{teacher.user.phone}</td>
       <td className="hidden md:table-cell">
