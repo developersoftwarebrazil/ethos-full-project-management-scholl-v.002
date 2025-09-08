@@ -78,6 +78,7 @@ class TeacherForm(forms.ModelForm):
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     form = TeacherForm
+    
     list_display = (
         "id",
         "get_username",
@@ -89,6 +90,9 @@ class TeacherAdmin(admin.ModelAdmin):
         "birthday",
         "hire_date",
     )
+
+    filter_horizontal = ("subjects",)
+
     search_fields = (
         "user__username",
         "user__first_name",
@@ -96,7 +100,7 @@ class TeacherAdmin(admin.ModelAdmin):
         "user__email",
         "user__phone",
     )
-
+     
     def get_username(self, obj):
         return obj.user.username
     get_username.short_description = "Username"

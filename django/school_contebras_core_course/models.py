@@ -106,6 +106,13 @@ class Teacher(models.Model):
         related_name="teacher_profile"
     )
 
+
+    subjects = models.ManyToManyField(
+        'Subject',
+        related_name='teachers_for_admin',  # nome diferente para evitar conflito
+        blank=True,
+        verbose_name='Matérias'
+    )
      # Dados profissionais
     hire_date = models.DateField(verbose_name="Data de Contratação")
 
@@ -124,6 +131,7 @@ class Teacher(models.Model):
 
     def __str__(self):
      return f"{self.user.first_name} {self.user.last_name}"
+
 
 
 class Subject(models.Model):
@@ -145,7 +153,8 @@ class Subject(models.Model):
     teachers = models.ManyToManyField(
         "Teacher",
         related_name="teaching_subjects",  # evita colisão
-        verbose_name="Professores"
+        verbose_name="Professores",
+        blank=True,
     )
 
     class Meta:

@@ -8,6 +8,7 @@ from school_contebras_core_accounts.models import User
 # ===============================
 class UserSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
+    subjects = serializers.SerializerMethodField() 
     class Meta:
         model = User
         fields = [
@@ -20,9 +21,15 @@ class UserSerializer(serializers.ModelSerializer):
             "phone",
             "address",
             "img",
+            "subjects",
         ]
     def get_roles(self, obj):
         return [role.name for role in obj.roles.all()]
+
+    def get_subjects(self, obj):
+        if hasattr(obj, "teacher_profile"):  # se for professor
+            return [subject.name for subject in obj.teacher_profile.teaching_subjects.all()]
+        return []
 
 # ===============================
 # Teacher
