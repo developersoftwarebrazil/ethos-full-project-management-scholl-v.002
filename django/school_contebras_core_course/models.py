@@ -169,6 +169,7 @@ class Classroom(models.Model):
     grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name='classrooms', verbose_name='Série')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='classrooms', verbose_name='Curso')
     supervisor = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, related_name='supervised_classrooms', verbose_name='Supervisor')
+    teachers = models.ManyToManyField(Teacher, related_name='classrooms', blank=True, verbose_name='Professores')
 
     class Meta:
         verbose_name = "Turma"
@@ -292,7 +293,6 @@ class Assignment(models.Model):
     def __str__(self):
         return self.title
 
-
 class ExamResult(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name='Prova')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Aluno')
@@ -307,7 +307,6 @@ class ExamResult(models.Model):
     def __str__(self):
         return f"{self.student.user.first_name} - {self.exam.title}"
 
-
 class AssignmentResult(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, verbose_name='Atividade')
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Aluno')
@@ -321,7 +320,6 @@ class AssignmentResult(models.Model):
 
     def __str__(self):
         return f"{self.student.user.first_name} - {self.assignment.title}"
-
 
 class Attendance(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name='Aula')

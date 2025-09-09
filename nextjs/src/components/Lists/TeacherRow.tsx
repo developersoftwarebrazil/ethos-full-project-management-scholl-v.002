@@ -33,10 +33,10 @@ export default function TeacherRow({ teacher }: { teacher: Teacher }) {
       </td>
 
       <td className="hidden md:table-cell">{teacher.user.username}</td>
-      {/* <td className="hidden md:table-cell">{formatSubjects(teacher.teaching_subjects)}</td> */}
       <td className="hidden md:table-cell">{teacher.user.subjects?.join(", ")|| "-"}</td>
       <td className="hidden md:table-cell">{formatClassrooms(teacher.supervised_classrooms)}</td>
       <td className="hidden md:table-cell">{teacher.user.phone}</td>
+      <td className="hidden md:table-cell">{teacher.user.address}</td>
       <td className="hidden md:table-cell">
         {new Date(teacher.hire_date).toLocaleDateString("pt-BR")}
       </td>
@@ -44,7 +44,7 @@ export default function TeacherRow({ teacher }: { teacher: Teacher }) {
       {/* Ações */}
       <td>
         <div className="flex items-center gap-2">
-          <Link href={`/list/teachers/${teacher.user.id}`}>
+          <Link href={`/list/teachers/${teacher.id}`}>
             <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky">
               <Image src="/view.png" alt="Visualizar" width={16} height={16} />
             </button>

@@ -30,13 +30,20 @@ class UserSerializer(serializers.ModelSerializer):
         if hasattr(obj, "teacher_profile"):  # se for professor
             return [subject.name for subject in obj.teacher_profile.teaching_subjects.all()]
         return []
+    
+class ClassroomBasicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Classroom
+        fields = ["id", "name"]
+
 
 # ===============================
 # Teacher
 # ===============================
 class TeacherSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-
+    supervised_classrooms = ClassroomBasicSerializer(many=True, read_only=True)  # 👈 aqui
+    teaching_classrooms = serializers.SerializerMethodField()  # turmas que ele leciona
     class Meta:
         model = Teacher
         fields = [
@@ -47,9 +54,17 @@ class TeacherSerializer(serializers.ModelSerializer):
             "bloodType",
             "birthday",
             "createdAt",
+            "supervised_classrooms",  # 👈 incluído
+            "teaching_classrooms",
         ]
 
-
+    def get_teaching_classrooms(self, obj):
+        """
+        Retorna todas as turmas em que o professor leciona.
+        """
+        # pega todas as turmas onde ele é professor (ManyToManyField em Classroom)
+        classrooms = obj.classrooms.all()  # relacao via Classroom.teachers
+        return ClassroomBasicSerializer(classrooms, many=True).data
 # ===============================
 # Student
 # ===============================

@@ -71,7 +71,6 @@ class TeacherForm(forms.ModelForm):
 
         return teacher
 
-
 # ========================
 # Teacher Admin
 # ========================
@@ -138,12 +137,29 @@ class StudentAdmin(admin.ModelAdmin):
     get_email.short_description = "Email"
 
 # ========================
+# Classes
+# ========================
+@admin.register(Classroom)
+class ClassroomAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "grade", "course", "get_supervisor", "get_teachers")
+    search_fields = ("name", "course__titleCourse", "grade__name")
+    list_filter = ("course", "grade")
+    filter_horizontal = ("teachers",)  # permite escolher múltiplos professores com interface amigável
+
+    def get_supervisor(self, obj):
+        return f"{obj.supervisor.user.first_name} {obj.supervisor.user.last_name}" if obj.supervisor else "-"
+    get_supervisor.short_description = "Supervisor"
+
+    def get_teachers(self, obj):
+        return ", ".join([f"{t.user.first_name} {t.user.last_name}" for t in obj.teachers.all()])
+    get_teachers.short_description = "Professores"
+
+# ========================
 # Registros simples
 # ========================
 admin.site.register(Course)
 admin.site.register(Grade)
 admin.site.register(Subject)
-admin.site.register(Classroom)
 admin.site.register(RegistrationClassroom)
 admin.site.register(Lesson)
 admin.site.register(Exam)

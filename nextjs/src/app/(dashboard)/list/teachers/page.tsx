@@ -29,6 +29,7 @@ const columns = [
     className: "hidden md:table-cell",
   },
   { headers: "Telefone", accessor: "phone", className: "hidden lg:table-cell" },
+  { headers: "Endereço", accessor: "address", className: "hidden md:table-cell" },
   {
     headers: "Data de Contratação",
     accessor: "hire_date",
