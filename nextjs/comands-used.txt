@@ -1,2 +1,8 @@
 instalando graficos 
 npm i re-chart  
+
+
+Erros corrigidos
+O container externa-storage não inicializava
+Solução:
+Após rodar o sh ./deploy.sh usei o comando "docker compose -f nginx/docker-compose.yaml up -d"

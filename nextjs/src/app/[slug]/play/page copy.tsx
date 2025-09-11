@@ -7,7 +7,7 @@ import { VideoPlayer } from "../../../components/Video/VideoPlayer";
 import { VideosRecommendList } from "../../../components/VideosRecommended";
 import { VideoViews } from "./VideoViews";
 import { VideoLikeCounter } from "./VideoLike";
-import { RegisterView } from "../../../components/Video/RegisterView";
+import { unstable_after as after } from "next/server";
 
 export default async function VideoPlayPage({
   params,
@@ -15,10 +15,16 @@ export default async function VideoPlayPage({
   params: { slug: string };
 }) {
   const video = await getVideo(params.slug);
-
+  after(async () => {
+    await fetch(
+      `${process.env.DJANGO_API_URL}/videos/${video.id}/register-view`,
+      {
+        method: "POST",
+      }
+    );
+  });
   return (
     <main className="container mx-auto px-4 py-6">
-      <RegisterView videoId={video.id.toString()} />
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <div className="bg-black rounded-lg overflow-hidden">
