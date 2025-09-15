@@ -4,36 +4,26 @@ import BigCalendar from "@/components/Events/BigCalendar";
 import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
+import Shortcuts from "@/components/Shortcuts/Shortcut";
+
+// agora tudo vem centralizado
+import { Teacher, Role } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-type Teacher = {
-  id: number;
-  user: {
-    first_name: string;
-    last_name: string;
-    username: string;
-    email: string;
-    phone: string | null;
-    address: string | null;
-    img: string | null;
-  };
-  hire_date: string;
-  sex: string;
-  bloodType: string;
-  birthday: string;
-  teaching_subjects: { name: string }[];
-  supervised_classrooms: { name: string }[];
-};
+const teacherRole: Role = { id: 1, name: "teacher" };
 
 export default async function SingleTeacherPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const teacher: Teacher | null = await fetch(`${API_URL}/api/teachers/${params.id}/`, {
-    cache: "no-store",
-  }).then((res) => (res.ok ? res.json() : null));
+  const teacher: Teacher | null = await fetch(
+    `${API_URL}/api/teachers/${params.id}/`,
+    {
+      cache: "no-store",
+    }
+  ).then((res) => (res.ok ? res.json() : null));
 
   if (!teacher) return <p>Professor não encontrado</p>;
 
@@ -88,9 +78,7 @@ export default async function SingleTeacherPage({
             <Image src="/singleLesson.png" alt="" width={24} height={24} />
             <div>
               <h1 className="text-xl font-semibold">
-            
                 {(teacher.teaching_subjects || []).length}
-
               </h1>
               <span className="text-sm text-gray-400">Matérias</span>
             </div>
@@ -99,9 +87,7 @@ export default async function SingleTeacherPage({
             <Image src="/singleClass.png" alt="" width={24} height={24} />
             <div>
               <h1 className="text-xl font-semibold">
-              
                 {(teacher.supervised_classrooms || []).length}
-
               </h1>
               <span className="text-sm text-gray-400">Turmas</span>
             </div>
@@ -116,7 +102,7 @@ export default async function SingleTeacherPage({
       </div>
 
       {/* RIGHT */}
-      <div className="flex flex-col w-full xl:w-1/3 gap-4">
+      {/* <div className="flex flex-col w-full xl:w-1/3 gap-4">
         <div className="bg-white rounded-md p-4">
           <h1 className="text-xl font-semibold">Shortcuts</h1>
           <div className="flex flex-wrap text-xs text-gray-500 gap-4 mt-4">
@@ -136,6 +122,15 @@ export default async function SingleTeacherPage({
               Teacher&apos;s Assignments
             </Link>
           </div>
+        </div>
+
+        <Performance />
+        <Annoucements />
+      </div> */}
+
+      <div className="flex flex-col w-full xl:w-1/3 gap-4">
+        <div className="bg-white rounded-md p-4">
+          <Shortcuts title="Shortcuts" role={teacherRole} />
         </div>
         <Performance />
         <Annoucements />

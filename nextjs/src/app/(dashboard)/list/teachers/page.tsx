@@ -3,11 +3,10 @@ import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
 import FormModel from "@/components/Forms/FormModel";
 import TeacherRow from "@/components/Lists/TeacherRow";
-import { Teacher } from "@/lib/type";
+import { Teacher } from "@/lib/types/teacher";
 import { role } from "@/lib/data";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
-
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -29,7 +28,11 @@ const columns = [
     className: "hidden md:table-cell",
   },
   { headers: "Telefone", accessor: "phone", className: "hidden lg:table-cell" },
-  { headers: "Endereço", accessor: "address", className: "hidden md:table-cell" },
+  {
+    headers: "Endereço",
+    accessor: "address",
+    className: "hidden md:table-cell",
+  },
   {
     headers: "Data de Contratação",
     accessor: "hire_date",

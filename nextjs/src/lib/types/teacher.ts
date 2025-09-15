@@ -1,19 +1,5 @@
-// types/teacher.ts
-export type TeachingSubject = {
-  id: number;
-  name: string;
-  description: string;
-};
-
-export type Classroom = {
- id: number;
-  name: string;
-  grade: number | string;
-  course: {
-    id: number;
-    titleCourse: string;
-  };
-};
+import { Role } from "./role";
+import { TeachingSubject } from "./teachingSubject";
 
 export type Teacher = {
   id: number;
@@ -23,7 +9,7 @@ export type Teacher = {
     first_name: string;
     last_name: string;
     email: string;
-    roles: string[]; // <- array, não string
+    roles: Role[]; // <- objeto, não string
     phone: string | null;
     address: string | null;
     img: string | null;
@@ -34,7 +20,7 @@ export type Teacher = {
   bloodType: string;
   birthday: string;
   createdAt: string;
-  teaching_subjects?: { id: number; name: string }[];
+  teaching_subjects?: TeachingSubject[];
   supervised_classrooms?: { id: number; name: string }[];
 };
 

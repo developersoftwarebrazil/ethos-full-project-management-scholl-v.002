@@ -15,7 +15,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 class UserSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
-
+    img = serializers.ImageField(use_url=True, required=False, allow_null=True)
     class Meta:
         model = User
         fields = [

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
-import { Teacher } from "@/lib/type";
+import { Teacher } from "@/lib/types/teacher";
 import { role } from "@/lib/data";
 
 function formatSubjects(subjects: Teacher["teaching_subjects"]) {
@@ -33,8 +33,12 @@ export default function TeacherRow({ teacher }: { teacher: Teacher }) {
       </td>
 
       <td className="hidden md:table-cell">{teacher.user.username}</td>
-      <td className="hidden md:table-cell">{teacher.user.subjects?.join(", ")|| "-"}</td>
-      <td className="hidden md:table-cell">{formatClassrooms(teacher.supervised_classrooms)}</td>
+      <td className="hidden md:table-cell">
+        {teacher.user.subjects?.join(", ") || "-"}
+      </td>
+      <td className="hidden md:table-cell">
+        {formatClassrooms(teacher.supervised_classrooms)}
+      </td>
       <td className="hidden md:table-cell">{teacher.user.phone}</td>
       <td className="hidden md:table-cell">{teacher.user.address}</td>
       <td className="hidden md:table-cell">
