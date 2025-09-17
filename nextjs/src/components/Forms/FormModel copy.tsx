@@ -2,8 +2,9 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useState } from "react";
+// import TeacherForm from "./TeacherForm";
+// import StudentForm from "./StudentForm";
 
-// Dinâmico
 const TeacherForm = dynamic(() => import("./TeacherForm"), {
   loading: () => <h1>Loading...</h1>,
 });
@@ -11,13 +12,12 @@ const StudentForm = dynamic(() => import("./StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
 
-// Mapeamento de forms
 const forms: {
   [key: string]: (type: "create" | "update", data?: any) => JSX.Element;
 } = {
   teacher: (type, data) => <TeacherForm type={type} data={data} />,
   student: (type, data) => <StudentForm type={type} data={data} />,
-  // Adicione outros forms se necessário
+  // Add other forms here as needed
 };
 
 const FormModel = ({
@@ -53,26 +53,21 @@ const FormModel = ({
   const [open, setOpen] = useState(false);
 
   const Form = () => {
-    if (type === "delete" && id) {
-      return (
-        <form className="flex flex-col p-4 gap-4">
-          <span className="text-center font-medium">
-            All data will be lost. Are you sure you want to delete this {table}?
-          </span>
-          <button className="w-max self-center bg-red-700 text-white rounded-md border-none px-4 py-2">
-            Delete
-          </button>
-        </form>
-      );
-    }
-
-    if (type === "create" || type === "update") {
-      return forms[table](type, data);
-    }
-
-    return <span className="text-red-500">Form not found.</span>;
+    return type === "delete" && id ? (
+      <form action="" className="flex flex-col p-4 gap-4">
+        <span className="text-center font-medium">
+          All data will be lost. Are you sure you want to delete this {table}?
+        </span>
+        <button className="w-max self-center bg-red-700 text-white rounded-md border-none px-4 py-2">
+          Delete
+        </button>
+      </form>
+    ) : type === "create" || type === "update" ? (
+      forms[table](type, data)
+    ) : (
+      <span className="text-red-500">Form not found.</span>
+    );
   };
-
   return (
     <>
       <button
@@ -81,7 +76,6 @@ const FormModel = ({
       >
         <Image src={`/${type}.png`} alt={""} width={16} height={16} />
       </button>
-
       {open && (
         <div className="w-screen h-screen left-0 top-0 absolute bg-black bg-opacity-60 z-50 flex items-center justify-center">
           <div className="bg-white rounded-md p-4 w-[90%] md:w-[70%] lg:w-[60%] xl:w-[50%] 2xl::w-[40%] relative">

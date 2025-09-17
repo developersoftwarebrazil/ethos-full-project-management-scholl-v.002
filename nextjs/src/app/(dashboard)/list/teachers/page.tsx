@@ -8,7 +8,7 @@ import { role } from "@/lib/data";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const columns = [
   { headers: "Info", accessor: "info" },
@@ -51,7 +51,7 @@ type TeacherResponse = {
 async function getTeachers(page: number = 1): Promise<TeacherResponse> {
   try {
     const res = await fetch(`${API_URL}/api/teachers/?page=${page}`, {
-      cache: "no-store",
+        next: { revalidate: 60 }, // 1 minuto
     });
     if (!res.ok) throw new Error("Erro ao buscar professores");
     return res.json();

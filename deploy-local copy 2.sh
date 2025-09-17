@@ -114,46 +114,27 @@ else
     echo "✅ Nenhuma migração pendente"
 fi
 
-echo "👤 Garantindo superusuário Django e roles padrão..."
+echo "👤 Garantindo superusuário Django..."
 docker compose exec -T django bash -c "
 pipenv run python manage.py shell -c \"
 from django.contrib.auth import get_user_model;
-from school_contebras_core_accounts.models import Role;
-
 User = get_user_model();
-
-# 🔹 Criar roles padrão
-roles = ['admin', 'common', 'teacher', 'student', 'supervisor']
-for r in roles:
-    Role.objects.get_or_create(name=r)
-
-# 🔹 Criar superusuário
-admin_user, created = User.objects.get_or_create(username='admin', defaults={
-    'email': 'admin@user.com',
-    'password': 'secret'
-})
-if created:
-    admin_user.set_password('secret')
-    admin_user.save()
-    print('✅ Superusuário criado')
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser(
+        username='admin',
+        email='admin@user.com',
+        password='secret'
+    )
 else:
     print('✅ Superusuário já existe, pulando...')
-
-# 🔹 Vincular role admin ao superusuário
-admin_role = Role.objects.get(name='admin')
-if admin_role not in admin_user.roles.all():
-    admin_user.roles.add(admin_role)
-    print('✅ Role admin atribuída ao superusuário')
-else:
-    print('✅ Superusuário já possui role admin')
-\"
-"
-
+\""
 wait_for_container go_app_dev
 wait_for_container nextjs
 
-echo "🎬 Iniciando consumidores Django em background..."
+echo "🎬 Iniciando consumidor Django - Upload Chunks (em background)..."
 docker compose exec -T django bash -c "pipenv run python manage.py consumer_upload_chunks_to_external_storage" &
+
+echo "📡 Iniciando consumidor Django - Registro Processamento (em background)..."
 docker compose exec -T django bash -c "pipenv run python manage.py consumer_register_processed_video_path" &
 
 sleep 5

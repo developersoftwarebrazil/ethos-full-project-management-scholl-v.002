@@ -105,7 +105,7 @@ const TeacherListPage = () => {
       <Table columns={columns} renderRow={renderRow} data={teachersData} />
 
       {/*  PAGINATIION */}
-      <Pagination />
+      <Pagination currentPage={0} totalPages={0} />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Lesson, Subject, Teacher, Student, Course, Classroom
-from school_contebras_core_accounts.models import User
+from school_contebras_core_accounts.models import User, Role
 
 
 # ===============================
@@ -41,30 +41,71 @@ class ClassroomBasicSerializer(serializers.ModelSerializer):
 # Teacher
 # ===============================
 class TeacherSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    supervised_classrooms = ClassroomBasicSerializer(many=True, read_only=True)  # 👈 aqui
-    teaching_classrooms = serializers.SerializerMethodField()  # turmas que ele leciona
+    user = UserSerializer(read_only=True)# apenas leitura
+    user_id = serializers.PrimaryKeyRelatedField(# usado no POST/PUT
+        queryset=User.objects.all(),
+        source="user",
+        write_only=True,
+        required=False,
+    )
+    supervised_classrooms = ClassroomBasicSerializer(many=True, read_only=True)
+    teaching_classrooms = serializers.SerializerMethodField()
+
     class Meta:
         model = Teacher
         fields = [
             "id",
             "user",
+            "user_id",
             "hire_date",
             "sex",
             "bloodType",
             "birthday",
             "createdAt",
-            "supervised_classrooms",  # 👈 incluído
+            "supervised_classrooms",
             "teaching_classrooms",
         ]
+        read_only_fields = ["createdAt", "supervised_classrooms", "teaching_classrooms"]
 
     def get_teaching_classrooms(self, obj):
-        """
-        Retorna todas as turmas em que o professor leciona.
-        """
-        # pega todas as turmas onde ele é professor (ManyToManyField em Classroom)
-        classrooms = obj.classrooms.all()  # relacao via Classroom.teachers
+        classrooms = obj.classrooms.all()
         return ClassroomBasicSerializer(classrooms, many=True).data
+
+    def create(self, validated_data):
+        user = validated_data.pop("user")
+
+        # Garantir que a role 'teacher' existe ou criar se não existir
+        teacher_role, created = Role.objects.get_or_create(name="teacher")
+
+        # Vincular a role ao usuário se ainda não tiver
+        if teacher_role not in user.roles.all():
+            user.roles.add(teacher_role)
+
+        # Criar o Teacher vinculado ao User
+        teacher = Teacher.objects.create(user=user, **validated_data)
+        return teacher
+
+    def update(self, instance, validated_data):
+        # Atualiza Teacher
+        teacher_fields = ["hire_date", "sex", "bloodType", "birthday"]
+        for field in teacher_fields:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Atualiza User se estiver presente no contexto
+        request_data = self.context.get("request").data if self.context.get("request") else {}
+        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address"] if k in request_data}
+
+        if user_data:
+            user = instance.user
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+            user.save()
+
+        instance.save()
+        return instance
+
+
 # ===============================
 # Student
 # ===============================
