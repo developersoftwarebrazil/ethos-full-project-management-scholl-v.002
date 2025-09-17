@@ -1,6 +1,10 @@
 "use client";
+
+import { BaseFormProps } from "@/lib/types/forms";
+
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // Dinâmico
@@ -13,10 +17,10 @@ const StudentForm = dynamic(() => import("./StudentForm"), {
 
 // Mapeamento de forms
 const forms: {
-  [key: string]: (type: "create" | "update", data?: any) => JSX.Element;
+  [key: string]: (props: BaseFormProps) => JSX.Element;
 } = {
-  teacher: (type, data) => <TeacherForm type={type} data={data} />,
-  student: (type, data) => <StudentForm type={type} data={data} />,
+  teacher: (props) => <TeacherForm {...props} />,
+  student: (props) => <StudentForm {...props} />,
   // Adicione outros forms se necessário
 };
 
@@ -51,6 +55,12 @@ const FormModel = ({
       : "bg-lamaPurple";
 
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSuccess = () => {
+    setOpen(false);
+    router.refresh(); // atualiza a página
+  };
 
   const Form = () => {
     if (type === "delete" && id) {
@@ -67,7 +77,7 @@ const FormModel = ({
     }
 
     if (type === "create" || type === "update") {
-      return forms[table](type, data);
+      return forms[table]({type, data, onSuccess:handleSuccess});
     }
 
     return <span className="text-red-500">Form not found.</span>;

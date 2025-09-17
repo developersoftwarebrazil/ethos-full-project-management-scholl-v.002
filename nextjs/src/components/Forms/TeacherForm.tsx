@@ -1,4 +1,7 @@
 "use client";
+
+import { BaseFormProps } from "@/lib/types/forms";
+
 import { useForm } from "react-hook-form";
 import InputField from "../Inputs/InputField";
 import Image from "next/image";
@@ -22,10 +25,8 @@ type Inputs = {
 const TeacherForm = ({
   type,
   data,
-}: {
-  type: "create" | "update";
-  data?: any;
-}) => {
+  onSuccess,
+}: BaseFormProps) => {
   const {
     register,
     handleSubmit,
@@ -62,6 +63,7 @@ const TeacherForm = ({
         console.log("✅ Teacher atualizado:", teacher);
         alert(`Teacher ${user.username} atualizado com sucesso!`);
       }
+      if (onSuccess) onSuccess(); // <-- fechar modal e atualizar lista
     } catch (err) {
       console.error("❌ Erro:", err);
       alert("Erro ao salvar Teacher. Veja o console.");

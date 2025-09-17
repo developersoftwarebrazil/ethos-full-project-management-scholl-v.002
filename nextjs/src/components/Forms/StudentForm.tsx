@@ -1,4 +1,7 @@
 "use client";
+
+import { BaseFormProps } from "@/lib/types/forms";
+
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,10 +45,7 @@ type Inputs = z.infer<typeof schema>;
 const StudentForm = ({
   type,
   data,
-}: {
-  type: "create" | "update";
-  data?: any;
-}) => {
+}: BaseFormProps) => {
   const {
     register,
     handleSubmit,
