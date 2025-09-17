@@ -1,5 +1,6 @@
 import { Role } from "./role";
 import { Classroom } from "./classroom";
+import { StudentSubject } from "./studentSubject";
 
 export type Student = {
   id: number;
@@ -10,15 +11,18 @@ export type Student = {
     last_name: string;
     email: string;
     roles: Role[];
-    phone: string | null;
-    address: string | null;
-    img: string | null;
+    phone?: string | null;
+    address?: string | null;
+    img?: string | null;
+    subjects: StudentSubject[];
   };
   birthday: string;
   bloodType: string;
-  sex: "M" | "F" | "O";
-  enrolled_classrooms?: Classroom[];
+  sex: "MALE" | "FERMALE";
+  // enrolled_classrooms?: Classroom[];
   createdAt: string;
+  classroom: number; // id
+  grade: number; // id
 };
 
 export type StudentResponse = {

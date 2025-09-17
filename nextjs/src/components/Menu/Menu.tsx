@@ -14,25 +14,25 @@ const menuItems = [
       },
       {
         icon: "/teacher.png",
-        label: "Teachers",
+        label: "Professores",
         href: "/list/teachers",
         visible: ["admin", "teacher"],
       },
       {
         icon: "/student.png",
-        label: "Students",
+        label: "Alunos",
         href: "/list/students",
         visible: ["admin", "teacher"],
       },
       {
         icon: "/parent.png",
-        label: "Parents",
+        label: "Responsáveis",
         href: "/list/parents",
         visible: ["admin", "teacher"],
       },
       {
         icon: "/subject.png",
-        label: "Subjects",
+        label: "Matérias",
         href: "/list/subjects",
         visible: ["admin"],
       },
@@ -44,7 +44,7 @@ const menuItems = [
       },
       {
         icon: "/lesson.png",
-        label: "Lessons",
+        label: "Aulas",
         href: "/list/lessons",
         visible: ["admin", "teacher"],
       },
