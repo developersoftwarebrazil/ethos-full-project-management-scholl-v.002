@@ -73,22 +73,22 @@ const TeacherForm = ({
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-xl font-semibold">
-        {type === "create" ? "Create new teacher" : "Update teacher"}
+        {type === "create" ? "Criar Professor" : "Atualizar Professor"}
       </h1>
 
       <span className="text-us text-gray-400 font-medium">
-        Authentication Information
+        Informações de Autentificação
       </span>
       <div className="flex flex-wrap justify-between items-center gap-4">
         <InputField
-          label="Username"
+          label="Nomde de Usuário"
           name="username"
           type="text"
           register={register}
           error={errors?.username}
         />
         <InputField
-          label="Email"
+          label="E-mail"
           name="email"
           type="email"
           register={register}
@@ -96,7 +96,7 @@ const TeacherForm = ({
         />
         {type === "create" && (
           <InputField
-            label="Password"
+            label="Senha"
             name="password"
             type="password"
             register={register}
@@ -106,46 +106,46 @@ const TeacherForm = ({
       </div>
 
       <span className="text-us text-gray-400 font-medium">
-        Personal Information
+        Informações Pessoais
       </span>
       <div className="flex flex-wrap justify-between items-center gap-4">
         <InputField
-          label="First Name"
+          label="Nome"
           name="first_name"
           type="text"
           register={register}
           error={errors?.first_name}
         />
         <InputField
-          label="Last Name"
+          label="Sobrenome"
           name="last_name"
           type="text"
           register={register}
           error={errors?.last_name}
         />
         <InputField
-          label="Phone"
+          label="Telefone"
           name="phone"
           type="tel"
           register={register}
           error={errors?.phone}
         />
         <InputField
-          label="Address"
+          label="Endereço"
           name="address"
           type="text"
           register={register}
           error={errors?.address}
         />
         <InputField
-          label="Birthday"
+          label="Data de Nascimento"
           name="birthday"
           type="date"
           register={register}
           error={errors?.birthday}
         />
         <InputField
-          label="Hire Date"
+          label="Data de Contratação"
           name="hire_date"
           type="date"
           register={register}
@@ -160,7 +160,7 @@ const TeacherForm = ({
         /> */}
 
         <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
-          <label className="text-xs text-gray-500">Blood Type</label>
+          <label className="text-xs text-gray-500">Tipo Sanguíneo</label>
           <select
             className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
             {...register("bloodType")}
@@ -178,14 +178,14 @@ const TeacherForm = ({
         </div>
 
         <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
-          <label className="text-xs text-gray-500">Sex</label>
+          <label className="text-xs text-gray-500">Sexo</label>
           <select
             className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
             {...register("sex")}
             defaultValue={data?.sex}
           >
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
+            <option value="MALE">Masculino</option>
+            <option value="FEMALE">Feminino</option>
           </select>
         </div>
 
@@ -195,7 +195,7 @@ const TeacherForm = ({
             htmlFor="img"
           >
             <Image src="/upload.png" alt="" width={28} height={28} />
-            <span>Upload a photo</span>
+            <span>Fazer Upload de foto</span>
           </label>
           <input
             type="file"
@@ -208,7 +208,7 @@ const TeacherForm = ({
       </div>
 
       <button className="bg-blue-400 p-2 text-white rounded-md">
-        {type === "create" ? "Create" : "Update"} Teacher
+        {type === "create" ? "Criar" : "Atualizar"} Professor
       </button>
     </form>
   );
