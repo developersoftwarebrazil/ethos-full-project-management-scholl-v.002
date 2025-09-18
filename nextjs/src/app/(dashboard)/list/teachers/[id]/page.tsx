@@ -8,6 +8,7 @@ import Shortcuts from "@/components/Shortcuts/Shortcut";
 
 // agora tudo vem centralizado
 import { Teacher, Role } from "@/lib/types";
+import { User } from "@clerk/nextjs/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -48,9 +49,12 @@ export default async function SingleTeacherPage({
               <h1 className="text-xl font-semibold">
                 {teacher.user.first_name} {teacher.user.last_name}
               </h1>
+              
               <FormModel table="teacher" type="update" data={teacher} />
             </div>
-
+            <p  className="text-sm text-gray-500">
+              {teacher.user.description}
+              </p>
             <div className="flex flex-wrap items-center justify-between text-xs font-medium gap-4">
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/blood.png" alt="" width={14} height={14} />
@@ -78,7 +82,7 @@ export default async function SingleTeacherPage({
             <Image src="/singleLesson.png" alt="" width={24} height={24} />
             <div>
               <h1 className="text-xl font-semibold">
-                {(teacher.teaching_subjects || []).length}
+                {(teacher.user.subjects || []).length}
               </h1>
               <span className="text-sm text-gray-400">Matérias</span>
             </div>
@@ -96,41 +100,15 @@ export default async function SingleTeacherPage({
 
         {/* BOTTOM */}
         <div className="bg-white rounded-md h-[800px] mt-4">
-          <h1>Teacher&apos;s Schedule</h1>
+          <h1> Agenda do Professor</h1>
           <BigCalendar data={[]} />
         </div>
       </div>
 
-      {/* RIGHT */}
-      {/* <div className="flex flex-col w-full xl:w-1/3 gap-4">
-        <div className="bg-white rounded-md p-4">
-          <h1 className="text-xl font-semibold">Shortcuts</h1>
-          <div className="flex flex-wrap text-xs text-gray-500 gap-4 mt-4">
-            <Link className="rounded-md p-3 bg-lamaSkyLight" href={"/"}>
-              Teacher&apos;s Classes
-            </Link>
-            <Link className="rounded-md p-3 bg-lamaPurpleLight" href={"/"}>
-              Teacher&apos;s Students
-            </Link>
-            <Link className="rounded-md p-3 bg-lamaYellowLight" href={"/"}>
-              Teacher&apos;s Lessons
-            </Link>
-            <Link className="rounded-md p-3 bg-pink-50" href={"/"}>
-              Teacher&apos;s Exams
-            </Link>
-            <Link className="rounded-md p-3 bg-lamaSkyLight" href={"/"}>
-              Teacher&apos;s Assignments
-            </Link>
-          </div>
-        </div>
-
-        <Performance />
-        <Annoucements />
-      </div> */}
-
+   
       <div className="flex flex-col w-full xl:w-1/3 gap-4">
         <div className="bg-white rounded-md p-4">
-          <Shortcuts title="Shortcuts" role={teacherRole} />
+          <Shortcuts title="Atalhos" role={teacherRole} />
         </div>
         <Performance />
         <Annoucements />

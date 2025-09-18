@@ -4,3 +4,7 @@ export type TeachingSubject = {
   name: string;
   description: string;
 };
+export type TeacherClassroom = {
+  id: number;
+  name: string;
+};

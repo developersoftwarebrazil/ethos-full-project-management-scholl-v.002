@@ -10,6 +10,7 @@ export const createOrUpdateTeacher = async (
   const teacherForm = new FormData();
   teacherForm.append("user_id", userId.toString());
 
+  if (formData.description)teacherForm.append("description", formData.description);
   if (formData.birthday) teacherForm.append("birthday", formData.birthday);
   if (formData.sex) teacherForm.append("sex", formData.sex);
   if (formData.hire_date) teacherForm.append("hire_date", formData.hire_date);

@@ -11,8 +11,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         # Adiciona campos customizados
         token['username'] = user.username
+        token['description'] = user.description  # 👈 agora vai
         token['email'] = user.email
         return token
+    
+    
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Adiciona campos extras na resposta
+        data['username'] = self.user.username
+        data['email'] = self.user.email
+        data['description'] = self.user.description
+        data['roles'] = [role.name for role in self.user.roles.all()]
+
+        return data
 class UserSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
     img = serializers.ImageField(use_url=True, required=False, allow_null=True)
@@ -25,6 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "roles",
+            "description",
             "phone",
             "address",
             "img",

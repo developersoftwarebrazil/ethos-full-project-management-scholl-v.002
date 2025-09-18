@@ -18,10 +18,21 @@ const columns = [
     className: "hidden md:table-cell",
   },
   {
+    headers: "Student ID",
+    accessor: "studentId",
+    className: "hidden md:table-cell",
+  },
+  {
+    headers: "Nota",
+    accessor: "grade",
+    className: "hidden md:table-cell",
+  },
+  {
     headers: "Matérias",
     accessor: "subjects",
     className: "hidden md:table-cell",
   },
+
   {
     headers: "Turmas",
     accessor: "classrooms",
@@ -33,13 +44,11 @@ const columns = [
     accessor: "address",
     className: "hidden md:table-cell",
   },
-  {
-    headers: "Data de Contratação",
-    accessor: "hire_date",
-    className: "hidden md:table-cell",
-  },
+ 
   { headers: "Ações", accessor: "action" },
 ];
+
+
 
 type StudentResponse = {
   count: number;
@@ -51,7 +60,7 @@ type StudentResponse = {
 async function getStudents(page: number = 1): Promise<StudentResponse> {
   try {
     const res = await fetch(`${API_URL}/api/students/?page=${page}`, {
-        next: { revalidate: 60 }, // 1 minuto
+      next: { revalidate: 60 }, // 1 minuto
     });
     if (!res.ok) throw new Error("Erro ao buscar alunos");
     return res.json();

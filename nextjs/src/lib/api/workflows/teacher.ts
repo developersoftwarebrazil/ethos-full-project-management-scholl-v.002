@@ -1,4 +1,4 @@
-import { createUser, assignRoleToUser, updateUser } from "../student";
+import { createUser, assignRoleToUser, updateUser } from "../user";
 import { createOrUpdateTeacher } from "../teacher";
 
 // Criar usuário + professor

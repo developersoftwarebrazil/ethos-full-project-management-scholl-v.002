@@ -11,7 +11,7 @@ interface ShortcutsProps {
 }
 
 export default function Shortcuts({
-  title = "Shortcuts",
+  title = "Atalhos",
   role,
   shortcuts,
 }: ShortcutsProps) {
@@ -24,20 +24,25 @@ export default function Shortcuts({
         colorClass: "bg-lamaSkyLight",
       },
       {
-        label: "Students",
+        label: "Alunos",
         href: "/list/students",
         colorClass: "bg-lamaPurpleLight",
       },
       {
-        label: "Lessons",
+        label: "Lições",
         href: "/list/lessons",
         colorClass: "bg-lamaYellowLight",
       },
-      { label: "Exams", href: "/list/exams", colorClass: "bg-pink-50" },
+      { label: "Provas", href: "/list/exams", colorClass: "bg-pink-50" },
       {
-        label: "Assignments",
+        label: "Tarefas",
         href: "/list/assignments",
         colorClass: "bg-lamaSkyLight",
+      },
+      {
+        label: "Disciplinas",
+        href: "/list/subjects",
+        colorClass: "bg-green-100",
       },
     ],
 

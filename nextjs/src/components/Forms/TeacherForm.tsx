@@ -13,6 +13,7 @@ type Inputs = {
   password?: string;
   first_name: string;
   last_name: string;
+  description?: string;
   phone?: string;
   address?: string;
   birthday?: string;
@@ -38,6 +39,7 @@ const TeacherForm = ({
           email: data.user?.email,
           first_name: data.user?.first_name,
           last_name: data.user?.last_name,
+          description: data.user?.description || "",
           phone: data.user?.phone,
           address: data.user?.address,
           birthday: data.birthday,
@@ -124,6 +126,13 @@ const TeacherForm = ({
           error={errors?.last_name}
         />
         <InputField
+          label="Descrição"
+          name="description"
+          type="text"
+          register={register}
+          error={errors?.description}
+        />
+        <InputField
           label="Telefone"
           name="phone"
           type="tel"
@@ -151,14 +160,7 @@ const TeacherForm = ({
           register={register}
           error={errors?.hire_date}
         />
-        {/* <InputField
-          label="Blood Type"
-          name="bloodType"
-          type="text"
-          register={register}
-          error={errors?.bloodType}
-        /> */}
-
+      
         <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
           <label className="text-xs text-gray-500">Tipo Sanguíneo</label>
           <select

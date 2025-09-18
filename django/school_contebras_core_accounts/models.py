@@ -20,6 +20,7 @@ class User(AbstractUser):
     roles = models.ManyToManyField(Role, related_name="users", blank=True)
 
     # Campos extras opcionais
+    description = models.TextField(null=True, blank=True, verbose_name="Descrição")
     phone = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="Telefone")
     address = models.CharField(max_length=255, null=True, blank=True, verbose_name="Endereço")
     img = models.ImageField(upload_to="users/", null=True, blank=True, verbose_name="Foto")

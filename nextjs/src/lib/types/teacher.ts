@@ -1,5 +1,5 @@
 import { Role } from "./role";
-import { TeachingSubject } from "./teachingSubject";
+import { TeacherClassroom, TeachingSubject } from "./teachingSubject";
 
 export type Teacher = {
   id: number;
@@ -10,6 +10,7 @@ export type Teacher = {
     last_name: string;
     email: string;
     roles: Role[]; // <- objeto, não string
+    description: string | null;
     phone: string | null;
     address: string | null;
     img: string | null;
@@ -21,6 +22,7 @@ export type Teacher = {
   birthday: string;
   createdAt: string;
   teaching_subjects?: TeachingSubject[];
+  teaching_classrooms?: TeacherClassroom[];
   supervised_classrooms?: { id: number; name: string }[];
 };
 

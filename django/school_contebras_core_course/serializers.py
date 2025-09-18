@@ -8,7 +8,8 @@ from school_contebras_core_accounts.models import User, Role
 # ===============================
 class UserSerializer(serializers.ModelSerializer):
     roles = serializers.SerializerMethodField()
-    subjects = serializers.SerializerMethodField() 
+    subjects = serializers.SerializerMethodField()
+    description = serializers.CharField(required=False, allow_blank=True) 
     class Meta:
         model = User
         fields = [
@@ -18,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "roles",
+            "description",  # 👈 adicionado
             "phone",
             "address",
             "img",
@@ -94,7 +96,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
         # Atualiza User se estiver presente no contexto
         request_data = self.context.get("request").data if self.context.get("request") else {}
-        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address"] if k in request_data}
+        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address", "description"] if k in request_data}
 
         if user_data:
             user = instance.user

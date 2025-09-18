@@ -34,6 +34,7 @@ class SchoolAdminAdmin(admin.ModelAdmin):
 # Teacher Form
 # ========================
 class TeacherForm(forms.ModelForm):
+    descrption = forms.CharField(max_length=255, required=False, label="Descrição")
     phone = forms.CharField(max_length=20, required=False, label="Telefone")
     address = forms.CharField(max_length=255, required=False, label="Endereço")
     img = forms.ImageField(required=False, label="Foto")
@@ -47,6 +48,7 @@ class TeacherForm(forms.ModelForm):
         # Pega o user associado, se existir
         user = getattr(self.instance, 'user', None)
         if user:
+            self.fields["descrption"].initial = user.description
             self.fields["phone"].initial = user.phone
             self.fields["address"].initial = user.address
             self.fields["img"].initial = user.img
@@ -61,6 +63,7 @@ class TeacherForm(forms.ModelForm):
             )
 
         # Atualiza os campos do user
+        teacher.user.description = self.cleaned_data.get("descrption")
         teacher.user.phone = self.cleaned_data.get("phone")
         teacher.user.address = self.cleaned_data.get("address")
         teacher.user.img = self.cleaned_data.get("img")
