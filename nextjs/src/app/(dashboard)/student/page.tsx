@@ -8,7 +8,7 @@ const StudentPage = () => {
       {/* LEFT */}
       <div className="w-full xl:w-2/3">
         <div className="h-full rounded-md bg-white p-4">
-          <h1 className="text-xl font-semibold">Schedle (4A)</h1>
+          <h1 className="text-xl font-semibold">Agenda (4A)</h1>
           <BigCalendar data={[]} />
         </div>
       </div>

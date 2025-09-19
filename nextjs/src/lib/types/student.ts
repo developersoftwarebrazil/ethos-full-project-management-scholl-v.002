@@ -17,9 +17,10 @@ export type Student = {
     subjects: StudentSubject[];
   };
   birthday: string;
+  
   bloodType: string;
   sex: "MALE" | "FERMALE";
-  // enrolled_classrooms?: Classroom[];
+   enrolled_classrooms?: Classroom[];
   createdAt: string;
   classroom: number; // id
   grade: number; // id

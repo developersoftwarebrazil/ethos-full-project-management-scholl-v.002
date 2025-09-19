@@ -26,11 +26,11 @@ export default function StudentRow({ student }: { student: Student }) {
         </div>
       </td>
 
-      <td className="hidden md:table-cell">{student.user.username}</td>
+      <td className="hidden md:table-cell">{student.user.id}</td>
       <td className="hidden md:table-cell">{student.grade}</td>
-      <td className="hidden md:table-cell">{student.classroom}</td>
-      <td className="hidden lg:table-cell">{student.user.phone || "-"}</td>
+      <td className="hidden lg:table-cell">{student.user.phone|| "-"}</td>
       <td className="hidden lg:table-cell">{student.user.address || "-"}</td>
+      {/* <td className="hidden md:table-cell">{student.classroom}</td> */}
 
       {/* Ações */}
       <td>

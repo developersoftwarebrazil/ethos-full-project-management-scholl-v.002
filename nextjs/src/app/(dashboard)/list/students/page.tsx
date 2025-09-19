@@ -12,11 +12,11 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const columns = [
   { headers: "Info", accessor: "info" },
-  {
-    headers: "Nome de usuário",
-    accessor: "username",
-    className: "hidden md:table-cell",
-  },
+  // {
+  //   headers: "Nome de usuário",
+  //   accessor: "username",
+  //   className: "hidden md:table-cell",
+  // },
   {
     headers: "Student ID",
     accessor: "studentId",
@@ -27,28 +27,15 @@ const columns = [
     accessor: "grade",
     className: "hidden md:table-cell",
   },
-  {
-    headers: "Matérias",
-    accessor: "subjects",
-    className: "hidden md:table-cell",
-  },
-
-  {
-    headers: "Turmas",
-    accessor: "classrooms",
-    className: "hidden md:table-cell",
-  },
   { headers: "Telefone", accessor: "phone", className: "hidden lg:table-cell" },
   {
     headers: "Endereço",
     accessor: "address",
     className: "hidden md:table-cell",
   },
- 
+
   { headers: "Ações", accessor: "action" },
 ];
-
-
 
 type StudentResponse = {
   count: number;
