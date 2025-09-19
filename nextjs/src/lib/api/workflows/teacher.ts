@@ -1,5 +1,5 @@
-import { createUser, assignRoleToUser, updateUser } from "../user";
-import { createOrUpdateTeacher } from "../teacher";
+import { createUser, assignRoleToUser, updateUser } from "../users";
+import { createOrUpdateTeacher } from "../teachers";
 
 // Criar usuário + professor
 export const createUserAndTeacher = async (formData: any) => {
@@ -16,6 +16,11 @@ export const updateUserAndTeacher = async (
   teacherId: number
 ) => {
   const user = await updateUser(userId, formData);
-  const teacher = await createOrUpdateTeacher(formData, userId, "update", teacherId);
+  const teacher = await createOrUpdateTeacher(
+    formData,
+    userId,
+    "update",
+    teacherId
+  );
   return { user, teacher };
 };

@@ -1,5 +1,5 @@
 // lib/api/students.ts
-import { createUser, assignRoleToUser, updateUser } from "./user";
+import { createUser, assignRoleToUser, updateUser } from "./users";
 
 export const createOrUpdateStudent = async (
   formData: any,
@@ -12,7 +12,8 @@ export const createOrUpdateStudent = async (
   if (formData.birthday) studentForm.append("birthday", formData.birthday);
   if (formData.sex) studentForm.append("sex", formData.sex);
   if (formData.bloodType) studentForm.append("bloodType", formData.bloodType);
-  if (formData.classroom) studentForm.append("classroom", formData.classroom.toString());
+  if (formData.classroom)
+    studentForm.append("classroom", formData.classroom.toString());
   if (formData.grade) studentForm.append("grade", formData.grade.toString());
 
   const url =
