@@ -6,23 +6,35 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import InputField from "../Inputs/InputField";
 import Image from "next/image";
-import { createUserAndStudent, updateUserAndStudent } from "@/lib/api/workflows/student";
-import { Student } from "@/lib/types/student";
+import {
+  createUserAndStudent,
+  updateUserAndStudent,
+} from "@/lib/api/workflows/student";
+import { Student } from "@/lib/types/student_original";
 import { BaseFormProps } from "@/lib/types/forms";
 
 // === SCHEMA DE VALIDAÇÃO ===
 const schema = z.object({
-  username: z.string().min(3, { message: "O username deve ter pelo menos 3 caracteres." }),
+  username: z
+    .string()
+    .min(3, { message: "O username deve ter pelo menos 3 caracteres." }),
   email: z.string().email({ message: "Email inválido." }),
-  password: z.string().min(6, { message: "Senha deve ter no mínimo 6 caracteres." }).optional(),
+  password: z
+    .string()
+    .min(6, { message: "Senha deve ter no mínimo 6 caracteres." })
+    .optional(),
   firstName: z.string().min(1, { message: "O nome é obrigatório." }),
   lastName: z.string().min(1, { message: "O sobrenome é obrigatório." }),
   phone: z.string().min(1, { message: "O telefone é obrigatório." }),
   address: z.string().min(1, { message: "O endereço é obrigatório." }),
-  birthday: z.string().min(1, { message: "A data de nascimento é obrigatória." }),
+  birthday: z
+    .string()
+    .min(1, { message: "A data de nascimento é obrigatória." }),
   sex: z.enum(["MALE", "FEMALE"]),
   img: z.any().optional(),
-  bloodType: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]).default("A+"),
+  bloodType: z
+    .enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"])
+    .default("A+"),
   classroom: z.string().optional(),
   grade: z.string().optional(),
 });
@@ -61,7 +73,11 @@ const StudentForm = ({ type, data, student, onSuccess }: StudentFormProps) => {
     try {
       let result;
       if (student) {
-        result = await updateUserAndStudent(formData, student.user.id, student.id);
+        result = await updateUserAndStudent(
+          formData,
+          student.user.id,
+          student.id
+        );
       } else {
         result = await createUserAndStudent(formData);
       }

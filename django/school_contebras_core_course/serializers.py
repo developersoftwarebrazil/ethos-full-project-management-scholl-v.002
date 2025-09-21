@@ -113,12 +113,19 @@ class TeacherSerializer(serializers.ModelSerializer):
 # ===============================
 class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        source="user",
+        write_only=True,
+        required=False,
+    )
 
     class Meta:
         model = Student
         fields = [
             "id",
             "user",
+            "user_id",
             "sex",
             "bloodType",
             "birthday",
@@ -126,6 +133,37 @@ class StudentSerializer(serializers.ModelSerializer):
             "classroom",
             "grade",
         ]
+    read_only_fields = ["createdAt"]
+
+    def create(self, validated_data):
+        user = validated_data.pop("user")
+
+        # Garantir que a role 'student' exista
+        student_role, _ = Role.objects.get_or_create(name="student")
+        if student_role not in user.roles.all():
+            user.roles.add(student_role)
+
+        return Student.objects.create(user=user, **validated_data)
+
+    def update(self, instance, validated_data):
+        # Atualizar apenas os campos do Student
+        student_fields = ["sex", "bloodType", "birthday", "classroom", "grade"]
+        for field in student_fields:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        # Atualizar User se vier no request
+        request_data = self.context.get("request").data if self.context.get("request") else {}
+        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address"] if k in request_data}
+
+        if user_data:
+            user = instance.user
+            for attr, value in user_data.items():
+                setattr(user, attr, value)
+            user.save()
+
+        instance.save()
+        return instance
 
 
 # ===============================

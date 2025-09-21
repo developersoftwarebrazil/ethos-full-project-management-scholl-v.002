@@ -1,6 +1,6 @@
+
 import { Role } from "./role";
-import { Classroom } from "./classroom";
-import { StudentSubject } from "./studentSubject";
+import { StudentClassroom, StudentSubject } from "./studentSubject";
 
 export type Student = {
   id: number;
@@ -10,20 +10,17 @@ export type Student = {
     first_name: string;
     last_name: string;
     email: string;
-    roles: Role[];
-    phone?: string | null;
-    address?: string | null;
-    img?: string | null;
-    subjects: StudentSubject[];
+    roles: Role[]; // <- objeto, não string
+    phone: string | null;
+    address: string | null;
+    img: string | null;
   };
-  birthday: string;
-  
+  sex: string;
   bloodType: string;
-  sex: "MALE" | "FERMALE";
-   enrolled_classrooms?: Classroom[];
+  birthday: string;
   createdAt: string;
-  classroom: number; // id
-  grade: number; // id
+  classroom?: { id: number; name: string } | null;
+  grade?: { id: number; name: string } | null;
 };
 
 export type StudentResponse = {

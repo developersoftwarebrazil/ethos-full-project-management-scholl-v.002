@@ -1,113 +1,205 @@
-// src/components/Forms/StudentForm.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { createUserAndStudent, updateUserAndStudent } from "@/lib/api/workflows/student";
-import { Student } from "@/lib/types/student";
+import { BaseFormProps } from "@/lib/types/forms";
 
-interface StudentFormProps {
-  student?: Student;
-  onSuccess?: (student: Student) => void;
-}
+import { useForm } from "react-hook-form";
+import InputField from "../Inputs/InputField";
+import Image from "next/image";
+import {
+  createUserAndStudent,
+  updateUserAndStudent,
+} from "@/lib/api/workflows";
 
-export default function StudentForm({ student, onSuccess }: StudentFormProps) {
-  const [formData, setFormData] = useState({
-    username: student?.user.username || "",
-    email: student?.user.email || "",
-    first_name: student?.user.first_name || "",
-    last_name: student?.user.last_name || "",
-    phone: student?.user.phone || "",
-    address: student?.user.address || "",
-    img: null as File | null,
-    sex: student?.sex || "MALE",
-    bloodType: student?.bloodType || "A+",
-    birthday: student?.birthday || "",
-    classroom: student?.classroom || "",
-    grade: student?.grade || "",
+type Inputs = {
+  username: string;
+  email: string;
+  password?: string;
+  first_name: string;
+  last_name: string;
+  phone?: string;
+  address?: string;
+  birthday?: string;
+  sex: "MALE" | "FEMALE";
+  img?: FileList;
+  bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  classrroom?: number;
+  grade?: number;
+
+};
+
+const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>({
+    defaultValues: data
+      ? {
+          username: data.user?.username,
+          email: data.user?.email,
+          first_name: data.user?.first_name,
+          last_name: data.user?.last_name,
+          phone: data.user?.phone,
+          address: data.user?.address,
+          birthday: data.birthday,
+          sex: data.sex,
+          bloodType: data.bloodType,
+          
+        }
+      : {},
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, files } = e.target as any;
-    if (files) setFormData({ ...formData, [name]: files[0] });
-    else setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (formData: Inputs) => {
     try {
-      let result;
-      if (student) {
-        result = await updateUserAndStudent(formData, student.user.id, student.id);
-      } else {
-        result = await createUserAndStudent(formData);
+      if (type === "create") {
+        const { user, student } = await createUserAndStudent(formData);
+        console.log("✅ student criado:", student);
+        alert(`student ${user.username} criado com sucesso!`);
+      } else if (type === "update" && data) {
+        const { user, student } = await updateUserAndStudent(
+          formData,
+          data.user.id,
+          data.id
+        );
+        console.log("✅ student atualizado:", student);
+        alert(`student ${user.username} atualizado com sucesso!`);
       }
-      onSuccess?.(result.student);
-      alert("Aluno salvo com sucesso!");
-    } catch (err: any) {
-      alert("Erro: " + err.message);
+      if (onSuccess) onSuccess(); // <-- fechar modal e atualizar lista
+    } catch (err) {
+      console.error("❌ Erro:", err);
+      alert("Erro ao salvar student. Veja o console.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white rounded-md shadow-md">
-      <div>
-        <label>Nome</label>
-        <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} required />
+    <form className="flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
+      <h1 className="text-xl font-semibold">
+        {type === "create" ? "Criar Aluno" : "Atualizar Aluno"}
+      </h1>
+
+      <span className="text-us text-gray-400 font-medium">
+        Informações de Autentificação
+      </span>
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <InputField
+          label="Nomde de Usuário"
+          name="username"
+          type="text"
+          register={register}
+          error={errors?.username}
+        />
+        <InputField
+          label="E-mail"
+          name="email"
+          type="email"
+          register={register}
+          error={errors?.email}
+        />
+        {type === "create" && (
+          <InputField
+            label="Senha"
+            name="password"
+            type="password"
+            register={register}
+            error={errors?.password}
+          />
+        )}
       </div>
-      <div>
-        <label>Sobrenome</label>
-        <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} required />
+
+      <span className="text-us text-gray-400 font-medium">
+        Informações Pessoais
+      </span>
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <InputField
+          label="Nome"
+          name="first_name"
+          type="text"
+          register={register}
+          error={errors?.first_name}
+        />
+        <InputField
+          label="Sobrenome"
+          name="last_name"
+          type="text"
+          register={register}
+          error={errors?.last_name}
+        />
+      
+        <InputField
+          label="Telefone"
+          name="phone"
+          type="tel"
+          register={register}
+          error={errors?.phone}
+        />
+        <InputField
+          label="Endereço"
+          name="address"
+          type="text"
+          register={register}
+          error={errors?.address}
+        />
+        <InputField
+          label="Data de Nascimento"
+          name="birthday"
+          type="date"
+          register={register}
+          error={errors?.birthday}
+        />
+
+        <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
+          <label className="text-xs text-gray-500">Tipo Sanguíneo</label>
+          <select
+            className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
+            {...register("bloodType")}
+            defaultValue={data?.bloodType}
+          >
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
+          <label className="text-xs text-gray-500">Sexo</label>
+          <select
+            className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
+            {...register("sex")}
+            defaultValue={data?.sex}
+          >
+            <option value="MALE">Masculino</option>
+            <option value="FEMALE">Feminino</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col w-full justify-center md:w-1/4">
+          <label
+            className="text-xs text-gray-500 items-center gap-2 cursor-pointer"
+            htmlFor="img"
+          >
+            <Image src="/upload.png" alt="" width={28} height={28} />
+            <span>Fazer Upload de foto</span>
+          </label>
+          <input
+            type="file"
+            id="img"
+            {...register("img")}
+            accept="image/*"
+            className="hidden"
+          />
+        </div>
       </div>
-      <div>
-        <label>Username</label>
-        <input type="text" name="username" value={formData.username} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Email</label>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Telefone</label>
-        <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
-      </div>
-      <div>
-        <label>Endereço</label>
-        <input type="text" name="address" value={formData.address} onChange={handleChange} />
-      </div>
-      <div>
-        <label>Foto</label>
-        <input type="file" name="img" onChange={handleChange} />
-      </div>
-      <div>
-        <label>Sexo</label>
-        <select name="sex" value={formData.sex} onChange={handleChange}>
-          <option value="MALE">Masculino</option>
-          <option value="FEMALE">Feminino</option>
-        </select>
-      </div>
-      <div>
-        <label>Tipo Sanguíneo</label>
-        <select name="bloodType" value={formData.bloodType} onChange={handleChange}>
-          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bt => (
-            <option key={bt} value={bt}>{bt}</option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label>Data de Nascimento</label>
-        <input type="date" name="birthday" value={formData.birthday} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Turma</label>
-        <input type="number" name="classroom" value={formData.classroom} onChange={handleChange} />
-      </div>
-      <div>
-        <label>Série</label>
-        <input type="number" name="grade" value={formData.grade} onChange={handleChange} />
-      </div>
-      <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md">
-        {student ? "Atualizar" : "Criar"} Aluno
+
+      <button className="bg-blue-400 p-2 text-white rounded-md">
+        {type === "create" ? "Criar" : "Atualizar"} Aluno
       </button>
     </form>
   );
-}
+};
+
+export default StudentForm;

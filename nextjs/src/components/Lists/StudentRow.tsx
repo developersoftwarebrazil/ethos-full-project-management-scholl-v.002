@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
 import { role } from "@/lib/data";
-import { Student } from "@/lib/types/student";
+import { Student } from "@/lib/types/student_original";
 
 export default function StudentRow({ student }: { student: Student }) {
   return (
@@ -21,14 +21,16 @@ export default function StudentRow({ student }: { student: Student }) {
           className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
         />
         <div className="flex flex-col">
-          <h3 className="font-semibold">{student.user.first_name} {student.user.last_name}</h3>
+          <h3 className="font-semibold">
+            {student.user.first_name} {student.user.last_name}
+          </h3>
           <p className="text-xs text-gray-500">{student.user.email}</p>
         </div>
       </td>
 
       <td className="hidden md:table-cell">{student.user.id}</td>
       <td className="hidden md:table-cell">{student.grade}</td>
-      <td className="hidden lg:table-cell">{student.user.phone|| "-"}</td>
+      <td className="hidden lg:table-cell">{student.user.phone || "-"}</td>
       <td className="hidden lg:table-cell">{student.user.address || "-"}</td>
       {/* <td className="hidden md:table-cell">{student.classroom}</td> */}
 

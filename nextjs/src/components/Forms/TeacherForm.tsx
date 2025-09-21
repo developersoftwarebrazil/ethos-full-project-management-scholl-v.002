@@ -5,7 +5,7 @@ import { BaseFormProps } from "@/lib/types/forms";
 import { useForm } from "react-hook-form";
 import InputField from "../Inputs/InputField";
 import Image from "next/image";
-import { createUserAndTeacher, updateUserAndTeacher } from "@/lib/api/workflows";
+import { createUserAndTeacher, updateUserAndTeacher } from "@/lib/api/workflows/teacher";
 
 type Inputs = {
   username: string;
