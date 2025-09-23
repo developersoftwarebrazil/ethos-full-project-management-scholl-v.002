@@ -8,7 +8,7 @@ import Image from "next/image";
 import {
   createUserAndStudent,
   updateUserAndStudent,
-} from "@/lib/api/workflows/student";
+} from "@/lib/api/workflows";
 
 type Inputs = {
   username: string;
@@ -16,13 +16,15 @@ type Inputs = {
   password?: string;
   first_name: string;
   last_name: string;
-  description?: string;
   phone?: string;
   address?: string;
   birthday?: string;
   sex: "MALE" | "FEMALE";
   img?: FileList;
   bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  classrroom?: number;
+  grade?: number;
+
 };
 
 const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
@@ -37,12 +39,12 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
           email: data.user?.email,
           first_name: data.user?.first_name,
           last_name: data.user?.last_name,
-          description: data.user?.description || "",
           phone: data.user?.phone,
           address: data.user?.address,
           birthday: data.birthday,
           sex: data.sex,
           bloodType: data.bloodType,
+          
         }
       : {},
   });
@@ -51,21 +53,21 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
     try {
       if (type === "create") {
         const { user, student } = await createUserAndStudent(formData);
-        console.log("✅ Student criado:", student);
-        alert(`Student ${user.username} criado com sucesso!`);
+        console.log("✅ student criado:", student);
+        alert(`student ${user.username} criado com sucesso!`);
       } else if (type === "update" && data) {
         const { user, student } = await updateUserAndStudent(
           formData,
           data.user.id,
           data.id
         );
-        console.log("✅ Student atualizado:", student);
-        alert(`Student ${user.username} atualizado com sucesso!`);
+        console.log("✅ student atualizado:", student);
+        alert(`student ${user.username} atualizado com sucesso!`);
       }
       if (onSuccess) onSuccess(); // <-- fechar modal e atualizar lista
     } catch (err) {
       console.error("❌ Erro:", err);
-      alert("Erro ao salvar Student. Veja o console.");
+      alert("Erro ao salvar student. Veja o console.");
     }
   };
 
@@ -122,13 +124,7 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
           register={register}
           error={errors?.last_name}
         />
-        <InputField
-          label="Descrição"
-          name="description"
-          type="text"
-          register={register}
-          error={errors?.description}
-        />
+      
         <InputField
           label="Telefone"
           name="phone"
@@ -150,7 +146,6 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
           register={register}
           error={errors?.birthday}
         />
-       
 
         <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
           <label className="text-xs text-gray-500">Tipo Sanguíneo</label>

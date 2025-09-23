@@ -7,6 +7,7 @@ type InputFieldProps = {
   name: string;
   defaultValue?: string;
   error?: FieldError;
+  onBlur?: () => void;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 };
 

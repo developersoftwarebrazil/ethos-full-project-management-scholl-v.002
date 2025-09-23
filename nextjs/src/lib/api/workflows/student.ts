@@ -1,5 +1,5 @@
-import { createOrUpdateStudent } from "../students_original";
-import { assignRoleToUser, createUser, updateUser } from "../users";
+import { createUser, assignRoleToUser, updateUser } from "../users";
+import { createOrUpdateStudent } from "../students";
 
 // Criar usuário + aluno
 export const createUserAndStudent = async (formData: any) => {
@@ -9,7 +9,7 @@ export const createUserAndStudent = async (formData: any) => {
   return { user, student };
 };
 
-// Atualizar usuário + aluno
+// Atualizar usuário + professor
 export const updateUserAndStudent = async (
   formData: any,
   userId: number,

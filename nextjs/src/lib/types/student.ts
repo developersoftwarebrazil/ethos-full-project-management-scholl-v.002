@@ -11,9 +11,11 @@ export type Student = {
     last_name: string;
     email: string;
     roles: Role[]; // <- objeto, não string
+    desctription?: string;
     phone: string | null;
     address: string | null;
     img: string | null;
+    subjects?: StudentSubject[];
   };
   sex: string;
   bloodType: string;

@@ -9,8 +9,8 @@ import Image from "next/image";
 import {
   createUserAndStudent,
   updateUserAndStudent,
-} from "@/lib/api/workflows/student";
-import { Student } from "@/lib/types/student_original";
+} from "@/lib/files_to_delete/student_delete";
+import { Student } from "@/lib/files_to_delete/student_original";
 import { BaseFormProps } from "@/lib/types/forms";
 
 // === SCHEMA DE VALIDAÇÃO ===

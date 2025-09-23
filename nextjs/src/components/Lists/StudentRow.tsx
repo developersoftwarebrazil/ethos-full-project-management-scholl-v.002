@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
 import { role } from "@/lib/data";
-import { Student } from "@/lib/types/student_original";
+import { Student } from "@/lib/files_to_delete/student_original";
 
 export default function StudentRow({ student }: { student: Student }) {
   return (

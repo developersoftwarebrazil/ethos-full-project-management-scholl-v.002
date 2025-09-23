@@ -46,13 +46,47 @@ export const updateUser = async (userId: number, formData: any) => {
 
 // Atribuir role
 export const assignRoleToUser = async (userId: number, roleName: string) => {
-  const res = await fetch(`http://localhost:8000/api/users/${userId}/assign-role/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ role: roleName }),
-  });
+  const res = await fetch(
+    `http://localhost:8000/api/users/${userId}/assign-role/`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: roleName }),
+    }
+  );
 
   if (!res.ok) throw new Error(await res.text());
 
   return res.json();
 };
+
+// Buscar usuário por username
+export const findUserByUsername = async (username: string) => {
+  const res = await fetch(`http://localhost:8000/api/users/?username=${username}`);
+
+  if (!res.ok) {
+    throw new Error(`Erro ao buscar usuário: ${res.status}`);
+  }
+
+  const data = await res.json();
+
+  // retorna o primeiro match (ou null)
+  return data.results.length > 0 ? data.results[0] : null;
+};
+
+// Adicionar role a um usuário existente
+export const addRoleToUser = async (userId: number, role: string) => {
+  const res = await fetch(`http://localhost:8000/api/users/${userId}/assign-role/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ role }) // alguns backends podem esperar { roleName: role }
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(JSON.stringify(err));
+  }
+
+  return await res.json();
+};
+

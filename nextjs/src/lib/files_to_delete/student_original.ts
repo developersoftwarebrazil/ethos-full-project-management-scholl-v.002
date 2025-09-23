@@ -1,6 +1,6 @@
-import { Role } from "./role";
-import { Classroom } from "./classroom";
-import { StudentSubject } from "./studentSubject";
+import { Role } from "../types/role";
+import { Classroom } from "../types/classroom";
+import { StudentSubject } from "../types/studentSubject";
 
 export type Student = {
   id: number;
@@ -17,10 +17,10 @@ export type Student = {
     subjects: StudentSubject[];
   };
   birthday: string;
-  
+
   bloodType: string;
   sex: "MALE" | "FERMALE";
-   enrolled_classrooms?: Classroom[];
+  enrolled_classrooms?: Classroom[];
   createdAt: string;
   classroom: number; // id
   grade: number; // id

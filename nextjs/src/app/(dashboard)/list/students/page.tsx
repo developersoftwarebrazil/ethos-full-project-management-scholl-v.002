@@ -2,7 +2,7 @@ import Table from "@/components/Lists/Table";
 import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
 import FormModel from "@/components/Forms/FormModel";
-import { Student } from "@/lib/types/student_original";
+import { Student } from "@/lib/files_to_delete/student_original";
 import { role } from "@/lib/data";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";

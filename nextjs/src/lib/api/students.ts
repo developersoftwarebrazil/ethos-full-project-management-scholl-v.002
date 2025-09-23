@@ -1,7 +1,7 @@
 // lib/api/students.ts
 
 // Criar ou atualizar professor
-export const createOrUpdatestudent = async (
+export const createOrUpdateStudent = async (
   formData: any,
   userId: number,
   type: "create" | "update",
@@ -10,10 +10,10 @@ export const createOrUpdatestudent = async (
   const studentForm = new FormData();
   studentForm.append("user_id", userId.toString());
 
+  if (formData.description)studentForm.append("description", formData.description);
   if (formData.birthday) studentForm.append("birthday", formData.birthday);
   if (formData.sex) studentForm.append("sex", formData.sex);
-  if (formData.classroom) studentForm.append("classroom", formData.classroom.toString());
-  if (formData.grade) studentForm.append("grade", formData.grade.toString());
+  if (formData.bloodType) studentForm.append("bloodType", formData.bloodType);
 
   const url =
     type === "create"
