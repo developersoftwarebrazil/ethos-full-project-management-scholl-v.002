@@ -5,11 +5,7 @@ import { BaseFormProps } from "@/lib/types/forms";
 import { useForm } from "react-hook-form";
 import InputField from "../Inputs/InputField";
 import Image from "next/image";
-import {
-  createUserAndTeacher,
-  updateUserAndTeacher,
-} from "@/lib/api/workflows/teacher";
-import { useAutoUsername } from "@/lib/hooks/useAutoUsername";
+import { createUserAndTeacher, updateUserAndTeacher } from "@/lib/api/workflows/teacher";
 
 type Inputs = {
   username: string;
@@ -27,12 +23,14 @@ type Inputs = {
   bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 };
 
-const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
+const TeacherForm = ({
+  type,
+  data,
+  onSuccess,
+}: BaseFormProps) => {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: data
@@ -51,11 +49,6 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
         }
       : {},
   });
-  const firstName = watch("first_name");
-  const lastName = watch("last_name");
-  
-  // Hook para gerar username automaticamente
-  useAutoUsername(firstName || "", lastName || "", setValue, "username");
 
   const onSubmit = async (formData: Inputs) => {
     try {
@@ -167,7 +160,7 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
           register={register}
           error={errors?.hire_date}
         />
-
+      
         <div className="flex flex-col justify-center w-full md:w-1/4 gap-4">
           <label className="text-xs text-gray-500">Tipo Sanguíneo</label>
           <select
