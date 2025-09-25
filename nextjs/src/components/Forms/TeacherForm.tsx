@@ -1,15 +1,15 @@
 "use client";
-
-import { BaseFormProps } from "@/lib/types/forms";
-
 import { useForm } from "react-hook-form";
-import InputField from "../Inputs/InputField";
 import Image from "next/image";
+
+import InputField from "../Inputs/InputField";
+import { BaseFormProps } from "@/lib/types/forms";
 import {
   createUserAndTeacher,
   updateUserAndTeacher,
 } from "@/lib/api/workflows/teacher";
 import { useAutoUsername } from "@/lib/hooks/useAutoUsername";
+import { useState } from "react";
 
 type Inputs = {
   username: string;
@@ -53,12 +53,28 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
   });
   const firstName = watch("first_name");
   const lastName = watch("last_name");
-  
+
+  //Estado para saber se username existe
+  const [usernameExists, setUsernameExists] = useState(false);
+
   // Hook para gerar username automaticamente
-  useAutoUsername(firstName || "", lastName || "", setValue, "username");
+  useAutoUsername(
+    firstName || "",
+    lastName || "",
+    setValue,
+    "username",
+    setUsernameExists
+  );
 
   const onSubmit = async (formData: Inputs) => {
     try {
+      if (usernameExists && type === "create") {
+        alert(
+          "Este username já existe. Será gerado automaticamente a partir de Nome + Sobrenome."
+        );
+        return;
+      }
+
       if (type === "create") {
         const { user, teacher } = await createUserAndTeacher(formData);
         console.log("✅ Teacher criado:", teacher);
@@ -89,13 +105,14 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
         Informações de Autentificação
       </span>
       <div className="flex flex-wrap justify-between items-center gap-4">
-        <InputField
-          label="Nomde de Usuário"
-          name="username"
-          type="text"
-          register={register}
-          error={errors?.username}
-        />
+        <div className="flex flex-col w-full ">
+          {usernameExists && (
+            <span className="text-red-500 text-xs mt-1">
+              Este username já existe. Será gerado automaticamente a partir de
+              Nome + Sobrenome.
+            </span>
+          )}
+        </div>
         <InputField
           label="E-mail"
           name="email"

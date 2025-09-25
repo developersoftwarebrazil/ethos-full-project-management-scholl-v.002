@@ -1,25 +1,38 @@
-// lib/hooks/useAutoUsername.ts
-import { useEffect } from "react";
-import { UseFormSetValue, FieldValues, Path } from "react-hook-form";
-import { normalizeUsername } from "@/lib/utils/normalize";
+import { useEffect, useRef } from "react";
+import { findUserByUsername } from "@/lib/api/users";
+import { UseFormSetValue } from "react-hook-form";
 
-/**
- * Hook para gerar automaticamente o username a partir de first_name e last_name
- * @param firstName - nome do usuário
- * @param lastName - sobrenome do usuário
- * @param setValue - função do react-hook-form para setar o valor
- * @param fieldName - campo que receberá o username (default: "username")
- */
-export const useAutoUsername = <T extends FieldValues>(
+export function useAutoUsername(
   firstName: string,
   lastName: string,
-  setValue: UseFormSetValue<T>,
-  fieldName?: Path<T>
-) => {
+  setValue: UseFormSetValue<any>, // <- aqui
+  fieldName: keyof any,           // <- aqui
+  setExists?: (exists: boolean) => void
+) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    if (firstName && lastName && fieldName) {
-      const username = normalizeUsername(firstName, lastName);
-      setValue(fieldName, username as any); // o "as any" resolve um conflito menor de tipos
-    }
-  }, [firstName, lastName, setValue, fieldName]);
-};
+    if (!firstName || !lastName) return;
+
+    const username = `${firstName}.${lastName}`.toLowerCase() + "@user.com";
+    setValue(fieldName as any, username); // cast para garantir compatibilidade
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    timeoutRef.current = setTimeout(async () => {
+      if (setExists) {
+        try {
+          const user = await findUserByUsername(username);
+          setExists(!!user);
+        } catch (err) {
+          console.error("Erro ao verificar username:", err);
+          setExists(false);
+        }
+      }
+    }, 500);
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [firstName, lastName, setValue, fieldName, setExists]);
+}
