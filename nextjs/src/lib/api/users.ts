@@ -61,8 +61,22 @@ export const assignRoleToUser = async (userId: number, roleName: string) => {
 };
 
 // Buscar usuário por username
+// export const findUserByUsername = async (username: string) => {
+//   const res = await fetch(`http://localhost:8000/api/users/?username=${username}`);
+
+//   if (!res.ok) {
+//     throw new Error(`Erro ao buscar usuário: ${res.status}`);
+//   }
+
+//   const data = await res.json();
+
+//   // retorna o primeiro match (ou null)
+//   return data.results.length > 0 ? data.results[0] : null;
+// };
+// lib/api/users.ts
 export const findUserByUsername = async (username: string) => {
-  const res = await fetch(`http://localhost:8000/api/users/?username=${username}`);
+  const encoded = encodeURIComponent(username);
+  const res = await fetch(`http://localhost:8000/api/users/?username=${encoded}`);
 
   if (!res.ok) {
     throw new Error(`Erro ao buscar usuário: ${res.status}`);
@@ -70,9 +84,19 @@ export const findUserByUsername = async (username: string) => {
 
   const data = await res.json();
 
-  // retorna o primeiro match (ou null)
-  return data.results.length > 0 ? data.results[0] : null;
+  // Segurança: garante que data.results é um array
+  const results = Array.isArray(data?.results) ? data.results : [];
+
+  // Tenta achar um username EXATO (case-insensitive) entre os resultados
+  const exact = results.find((u: any) => {
+    const uName = (u?.username ?? "").toString().toLowerCase();
+    return uName === username.toLowerCase();
+  });
+
+  // retorno: ou usuário exato, ou null
+  return exact || null;
 };
+
 
 // Adicionar role a um usuário existente
 export const addRoleToUser = async (userId: number, role: string) => {

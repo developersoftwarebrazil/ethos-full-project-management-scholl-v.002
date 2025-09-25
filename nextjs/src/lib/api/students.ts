@@ -29,3 +29,4 @@ export const createOrUpdateStudent = async (
 
   return res.json();
 };
+
