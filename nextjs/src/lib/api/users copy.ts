@@ -11,11 +11,6 @@ export const createUser = async (formData: any) => {
   if (formData.phone) userForm.append("phone", formData.phone);
   if (formData.address) userForm.append("address", formData.address);
   if (formData.img && formData.img[0]) userForm.append("img", formData.img[0]);
-  if (formData.description) userForm.append("description", formData.description);
-  if (formData.sex) userForm.append("sex", formData.sex);
-  if (formData.birthday) userForm.append("birthday", formData.birthday);
-  if (formData.bloodType) userForm.append("bloodType", formData.bloodType);
-  
 
   const res = await fetch("http://localhost:8000/api/users/", {
     method: "POST",

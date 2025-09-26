@@ -19,13 +19,10 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "roles",
-            "description", 
+            "description",  # 👈 adicionado
             "phone",
             "address",
             "img",
-            "sex",
-            "bloodType",
-            "birthday",
             "subjects",
         ]
     def get_roles(self, obj):
@@ -63,6 +60,9 @@ class TeacherSerializer(serializers.ModelSerializer):
             "user",
             "user_id",
             "hire_date",
+            "sex",
+            "bloodType",
+            "birthday",
             "createdAt",
             "supervised_classrooms",
             "teaching_classrooms",
@@ -89,14 +89,14 @@ class TeacherSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Atualiza Teacher
-        teacher_fields = ["hire_date"]
+        teacher_fields = ["hire_date", "sex", "bloodType", "birthday"]
         for field in teacher_fields:
             if field in validated_data:
                 setattr(instance, field, validated_data[field])
 
         # Atualiza User se estiver presente no contexto
         request_data = self.context.get("request").data if self.context.get("request") else {}
-        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address", "description","sex", "bloodType", "birthday"] if k in request_data}
+        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address", "description"] if k in request_data}
 
         if user_data:
             user = instance.user
@@ -126,6 +126,9 @@ class StudentSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "user_id",
+            "sex",
+            "bloodType",
+            "birthday",
             "createdAt",
             "classroom",
             "grade",
@@ -144,14 +147,14 @@ class StudentSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # Atualizar apenas os campos do Student
-        student_fields = ["classroom", "grade"]
+        student_fields = ["sex", "bloodType", "birthday", "classroom", "grade"]
         for field in student_fields:
             if field in validated_data:
                 setattr(instance, field, validated_data[field])
 
         # Atualizar User se vier no request
         request_data = self.context.get("request").data if self.context.get("request") else {}
-        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address", "sex", "bloodType", "birthday"] if k in request_data}
+        user_data = {k: request_data.get(k) for k in ["username", "email", "first_name", "last_name", "phone", "address"] if k in request_data}
 
         if user_data:
             user = instance.user

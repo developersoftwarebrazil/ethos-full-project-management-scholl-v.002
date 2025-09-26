@@ -105,6 +105,8 @@ class Teacher(models.Model):
         on_delete=models.CASCADE,
         related_name="teacher_profile"
     )
+
+
     subjects = models.ManyToManyField(
         'Subject',
         related_name='teachers_for_admin',  # nome diferente para evitar conflito
@@ -113,6 +115,11 @@ class Teacher(models.Model):
     )
      # Dados profissionais
     hire_date = models.DateField(verbose_name="Data de Contratação")
+
+    # Dados pessoais)
+    bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, verbose_name="Tipo Sanguíneo")
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES, verbose_name="Sexo")
+    birthday = models.DateField(verbose_name="Data de Nascimento")
     createdAt = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
     
     # subjects = models.ManyToManyField('Subject', related_name='teachers', verbose_name="Disciplinas")
@@ -178,6 +185,11 @@ class Student(models.Model):
         on_delete=models.CASCADE,
         related_name="student_profile"
     )
+
+    # Dados pessoais   
+    bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, verbose_name='Tipo Sanguíneo')
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES, verbose_name='Sexo')
+    birthday = models.DateField(verbose_name='Data de Nascimento')
     createdAt = models.DateTimeField(default=timezone.now, verbose_name='Criado em')
     
      # Relacionamentos acadêmicos

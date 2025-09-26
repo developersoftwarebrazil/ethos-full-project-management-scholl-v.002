@@ -128,9 +128,10 @@ for r in roles:
     Role.objects.get_or_create(name=r)
 
 # 🔹 Criar superusuário
-admin_user, created = User.objects.get_or_create(username='admin', defaults={
+admin_user, created = User.objects.get_or_create(username='admin@user.com', defaults={
     'email': 'admin@user.com',
-    'password': 'secret'
+    'is_staff': True,
+    'is_superuser': True
 })
 if created:
     admin_user.set_password('secret')

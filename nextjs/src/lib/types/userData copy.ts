@@ -1,16 +1,14 @@
-import { Role } from "./role";
-
-export type UserData = {
+export type  UserData = {
   id: number;
   username: string;
   first_name: string;
   last_name: string;
   email: string;
-  roles: Role[];
+  roles: string[];
   description?: string | null;
-  birthday: string |  null;
-  bloodType?: string | null;
+  birthday?: string |  null;
   phone?: string | null;
   address?: string | null;
   img?: string | null;
+  subjects: any[];
 };

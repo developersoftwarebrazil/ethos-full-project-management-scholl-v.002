@@ -50,6 +50,7 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
   useEffect(() => {
     if (data) {
       reset({
+        ...watch(),
         username: data.user?.username || "",
         email: data.user?.email || "",
         first_name: data.user?.first_name || "",
@@ -57,12 +58,12 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
         description: data.user?.description || "",
         phone: data.user?.phone || "",
         address: data.user?.address || "",
-        birthday: data.birthday || "",
-        sex: data.sex || "MALE",
-        bloodType: data.bloodType || "A+",
+        birthday: data.user.birthday || "",
+        sex: data.user.sex || "MALE",
+        bloodType: data.user.bloodType || "A+",
       });
     }
-  }, [data, reset]);
+  }, [data, reset, watch]);
 
   // 🔹 Auto username
   const firstName = watch("first_name");

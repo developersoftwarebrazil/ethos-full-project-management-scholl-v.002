@@ -81,8 +81,17 @@ class TeacherForm(forms.ModelForm):
 class TeacherAdmin(admin.ModelAdmin):
     form = TeacherForm
     
-    list_display = ("id", "get_username", "get_name", "get_email", "get_phone", "get_sex", "get_bloodType", "get_birthday", "hire_date")
-
+    list_display = (
+        "id",
+        "get_username",
+        "get_name",
+        "get_email",
+        "get_phone",
+        "sex",
+        "bloodType",
+        "birthday",
+        "hire_date",
+    )
 
     filter_horizontal = ("subjects",)
 
@@ -110,24 +119,12 @@ class TeacherAdmin(admin.ModelAdmin):
         return obj.user.phone
     get_phone.short_description = "Telefone"
 
-    def get_sex(self, obj):
-        return obj.user.get_sex_display() if obj.user.sex else "-"
-    get_sex.short_description = "Sexo"
-
-    def get_bloodType(self, obj):
-        return obj.user.bloodType or "-"
-    get_bloodType.short_description = "Tipo Sanguíneo"
-
-    def get_birthday(self, obj):
-        return obj.user.birthday or "-"
-    get_birthday.short_description = "Nascimento"
-
 # ========================
 # Student
 # ========================
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ("id", "get_username", "get_name", "get_email", "get_sex", "get_bloodType", "get_birthday", "classroom", "grade")
+    list_display = ("id", "get_username", "get_name", "get_email", "sex", "bloodType", "birthday", "classroom", "grade")
     search_fields = ("user__username", "user__first_name", "user__last_name", "user__email")
 
     def get_username(self, obj):
@@ -141,18 +138,6 @@ class StudentAdmin(admin.ModelAdmin):
     def get_email(self, obj):
         return obj.user.email
     get_email.short_description = "Email"
-
-    def get_sex(self, obj):
-        return obj.get_sex_display()
-    get_sex.short_description = "Sexo"
-
-    def get_bloodType(self, obj):
-        return obj.get_bloodType_display()
-    get_bloodType.short_description = "Tipo Sanguíneo"
-
-    def get_birthday(self, obj):
-        return obj.birthday.strftime("%d/%m/%Y") if obj.birthday else "-"
-    get_birthday.short_description = "Data de Nascimento"
 
 # ========================
 # Classes

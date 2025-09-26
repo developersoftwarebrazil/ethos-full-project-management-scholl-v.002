@@ -10,10 +10,10 @@ export const createOrUpdateStudent = async (
   const studentForm = new FormData();
   studentForm.append("user_id", userId.toString());
 
-  if (formData.description)studentForm.append("description", formData.description);
-  if (formData.birthday) studentForm.append("birthday", formData.birthday);
-  if (formData.sex) studentForm.append("sex", formData.sex);
-  if (formData.bloodType) studentForm.append("bloodType", formData.bloodType);
+  if (formData.description)studentForm.append("description", formData.user.description);
+  if (formData.birthday) studentForm.append("birthday", formData.user.birthday);
+  if (formData.sex) studentForm.append("sex", formData.user.sex);
+  if (formData.bloodType) studentForm.append("bloodType", formData.user.bloodType);
 
   const url =
     type === "create"

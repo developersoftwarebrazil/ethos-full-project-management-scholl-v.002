@@ -1,8 +1,16 @@
-# school_contebras_core_accounts/models.py
-
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+SEX_CHOICES = [
+    ('MALE', 'Masculino'),
+    ('FEMALE', 'Feminino'),
+]
+
+BLOOD_TYPE_CHOICES = [
+    ('A+', 'A+'), ('A-', 'A-'),
+    ('B+', 'B-'), ('AB+', 'AB-'),
+    ('O+', 'O-'),
+]
 
 
 class Role(models.Model):
@@ -17,38 +25,19 @@ class Role(models.Model):
         return self.name
 
 class User(AbstractUser):
-    roles = models.ManyToManyField(Role, related_name="users", blank=True)
+    roles = models.ManyToManyField("Role", related_name="users", blank=True)
 
-    # Campos extras opcionais
+    # Campos extras
     description = models.TextField(null=True, blank=True, verbose_name="Descrição")
     phone = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="Telefone")
     address = models.CharField(max_length=255, null=True, blank=True, verbose_name="Endereço")
     img = models.ImageField(upload_to="users/", null=True, blank=True, verbose_name="Foto")
 
+    # 👇 Novos campos pessoais
+    sex = models.CharField(max_length=10, choices=SEX_CHOICES, null=True, blank=True, verbose_name="Sexo")
+    bloodType = models.CharField(max_length=3, choices=BLOOD_TYPE_CHOICES, null=True, blank=True, verbose_name="Tipo Sanguíneo")
+    birthday = models.DateField(null=True, blank=True, verbose_name="Data de Nascimento")
+
+
     def __str__(self):
         return self.username
-
-    # Propriedades para checar roles
-    def has_role(self, role_name: str) -> bool:
-        return self.roles.filter(name=role_name).exists()
-
-    @property
-    def is_teacher(self):
-        return self.has_role("teacher")
-
-    @property
-    def is_student(self):
-        return self.has_role("student")
-
-    @property
-    def is_admin(self):
-        return self.has_role("admin")
-
-    @property
-    def is_supervisor(self):
-        return self.has_role("supervisor")
-
-    @property
-    def is_common(self):
-        return self.has_role("common")
-    

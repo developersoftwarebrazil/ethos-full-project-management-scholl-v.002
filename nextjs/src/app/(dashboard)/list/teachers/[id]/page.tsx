@@ -58,11 +58,15 @@ export default async function SingleTeacherPage({
             <div className="flex flex-wrap items-center justify-between text-xs font-medium gap-4">
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/blood.png" alt="" width={14} height={14} />
-                <span>{teacher.bloodType}</span>
+                <span>{teacher.user.bloodType}</span>
               </div>
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/date.png" alt="" width={14} height={14} />
-                <span>{new Date(teacher.birthday).toLocaleDateString()}</span>
+                <span>
+                  {teacher.user.birthday
+                    ? new Date(teacher.user.birthday).toLocaleDateString()
+                    : "-"}
+                </span>
               </div>
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/mail.png" alt="" width={14} height={14} />
