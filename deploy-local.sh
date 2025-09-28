@@ -9,6 +9,20 @@ DEFAULT_VOLUME_NAME="external-storage"
 VOLUME_NAME="$DEFAULT_VOLUME_NAME"
 
 # =======================
+# 🔑 Solicitar senha do usuário
+# =======================
+confirm_user_password() {
+    echo "🔑 Confirme a senha do usuário '$USER' para continuar."
+    sudo -k # força pedir a senha de novo
+    if sudo true; then
+        echo "✅ Senha confirmada."
+    else
+        echo "❌ Senha incorreta. Abortando."
+        exit 1
+    fi
+}
+
+# =======================
 # 📦 Verificação/Criação de volume Docker externo
 # =======================
 check_or_create_external_volume() {
@@ -16,14 +30,38 @@ check_or_create_external_volume() {
     echo "🗃️ Verificando volume externo Docker '$volume_name'..."
 
     if docker volume inspect "$volume_name" >/dev/null 2>&1; then
-        echo "✅ Volume externo '$volume_name' já existe."
+        echo "⚠️ Volume externo '$volume_name' já existe."
+        read -p "❓ Deseja manter o volume existente? [s/N]: " manter
+        manter=${manter,,} # converte para minúsculo
+        if [[ "$manter" != "s" && "$manter" != "sim" ]]; then
+            echo "🗑️ Removendo volume '$volume_name' e containers relacionados..."
+            confirm_user_password
+            docker compose down -v --remove-orphans
+            docker system prune -a --volumes -f
+            docker volume rm "$volume_name"
+            echo "📦 Volume '$volume_name' removido."
+            echo "📦 Criando novo volume '$volume_name'..."
+            confirm_user_password
+            docker volume create --name "$volume_name"
+            echo "✅ Novo volume '$volume_name' criado."
+        else
+            echo "✅ Mantendo volume '$volume_name'."
+        fi
     else
-        echo "⚠️ Volume '$volume_name' não encontrado."
-        read -p "🔤 Digite um nome para o novo volume Docker (ou pressione Enter para usar '$volume_name'): " new_volume_name
-        volume_name="${new_volume_name:-$volume_name}"
-        echo "📦 Criando volume externo '$volume_name'..."
-        docker volume create --name "$volume_name"
-        echo "✅ Volume externo '$volume_name' criado com sucesso!"
+        echo "⚠️ Nenhum volume chamado '$volume_name' encontrado."
+        read -p "❓ Deseja criar um novo volume agora? [S/n]: " criar
+        criar=${criar,,}
+        if [[ "$criar" != "n" && "$criar" != "nao" ]]; then
+            read -p "🔤 Digite um nome para o novo volume Docker (Enter para usar '$DEFAULT_VOLUME_NAME'): " new_volume_name
+            volume_name="${new_volume_name:-$DEFAULT_VOLUME_NAME}"
+            echo "📦 Criando volume externo '$volume_name'..."
+            confirm_user_password
+            docker volume create --name "$volume_name"
+            echo "✅ Volume externo '$volume_name' criado com sucesso!"
+        else
+            echo "❌ Nenhum volume criado. Abortando."
+            exit 1
+        fi
     fi
 
     export VOLUME_NAME="$volume_name"
