@@ -38,6 +38,7 @@ export const updateUser = async (userId: number, formData: any) => {
   if (formData.phone) userForm.append("phone", formData.phone);
   if (formData.address) userForm.append("address", formData.address);
   if (formData.img && formData.img[0]) userForm.append("img", formData.img[0]);
+  
 
   const res = await fetch(`http://localhost:8000/api/users/${userId}/`, {
     method: "PUT",

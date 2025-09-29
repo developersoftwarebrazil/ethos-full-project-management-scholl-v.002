@@ -102,6 +102,8 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
             birthday: prev.birthday || matchedUser.birthday || "",
             phone: prev.phone || matchedUser.phone || "",
             address: prev.address || matchedUser.address || "",
+            bloodType: prev.bloodType || matchedUser.bloodType || "A+",
+            sex: prev.sex || matchedUser.sex || "MALE", // 🔹 ADICIONAR
             username: matchedUser.username,
           }));
         } else {

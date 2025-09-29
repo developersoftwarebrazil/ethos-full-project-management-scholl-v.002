@@ -52,17 +52,19 @@ export default async function SingleStudentPage({
 
               <FormModel table="student" type="update" data={student} />
             </div>
-            <p className="text-sm text-gray-500">
-              {student.user.description}
-              </p>
+            <p className="text-sm text-gray-500">{student.user.description}</p>
             <div className="flex flex-wrap items-center justify-between text-xs font-medium gap-4">
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/blood.png" alt="" width={14} height={14} />
-                <span>{student.bloodType}</span>
+                <span>{student.user.bloodType}</span>
               </div>
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/date.png" alt="" width={14} height={14} />
-                <span>{new Date(student.birthday).toLocaleDateString()}</span>
+                <span>
+                  {student.user?.birthday
+                    ? new Date(student.user.birthday).toLocaleDateString()
+                    : "-"}
+                </span>
               </div>
               <div className="w-full md:w-1/3 flex items-center gap-2">
                 <Image src="/mail.png" alt="" width={14} height={14} />
@@ -88,13 +90,13 @@ export default async function SingleStudentPage({
             </div>
           </div>
           <div className="bg-white flex w-full rounded-md gap-4 p-4 md:w-[48%]">
-            <Image src="/singleClass.png" alt="" width={24} height={24} />
+            {/* <Image src="/singleClass.png" alt="" width={24} height={24} />
             <div>
               <h1 className="text-xl font-semibold">
                 {(student.supervised_classrooms || []).length}
               </h1>
               <span className="text-sm text-gray-400">Turmas</span>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -105,7 +107,6 @@ export default async function SingleStudentPage({
         </div>
       </div>
 
-   
       <div className="flex flex-col w-full xl:w-1/3 gap-4">
         <div className="bg-white rounded-md p-4">
           <Shortcuts title="Atalhos" role={studentRole} />

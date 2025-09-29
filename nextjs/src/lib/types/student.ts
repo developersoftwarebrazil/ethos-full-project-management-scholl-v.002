@@ -6,9 +6,6 @@ import { UserData } from "./userData";
 export type Student = {
   id: number;
   user: UserData;
-  sex: string;
-  bloodType: string;
-  birthday: string;
   createdAt: string;
   classroom?: { id: number; name: string } | null;
   grade?: { id: number; name: string } | null;

@@ -24,16 +24,16 @@ type Inputs = {
   phone?: string;
   address?: string;
   birthday?: string;
-  sex: "MALE" | "FEMALE";
+  sex?: "MALE" | "FEMALE" | "OTHER";
   img?: FileList;
-  bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  bloodType?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 };
 
 const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
   const [usernameExists, setUsernameExists] = useState(false);
-  // const [existingUserData, setExistingUserData] = useState<Partial<Inputs> | null>(null);
-  const [existingUserData, setExistingUserData] = useState<UserData | null>(null);
-
+  const [existingUserData, setExistingUserData] = useState<UserData | null>(
+    null
+  );
 
   const {
     register,
@@ -50,7 +50,6 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
   useEffect(() => {
     if (data) {
       reset({
-        ...watch(),
         username: data.user?.username || "",
         email: data.user?.email || "",
         first_name: data.user?.first_name || "",
@@ -58,12 +57,12 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
         description: data.user?.description || "",
         phone: data.user?.phone || "",
         address: data.user?.address || "",
-        birthday: data.user.birthday || "",
-        sex: data.user.sex || "MALE",
-        bloodType: data.user.bloodType || "A+",
+        birthday: data.user?.birthday || "",
+        sex: data.user?.sex || "",
+        bloodType: data.user?.bloodType || "",
       });
     }
-  }, [data, reset, watch]);
+  }, [data, reset]);
 
   // 🔹 Auto username
   const firstName = watch("first_name");
@@ -76,21 +75,16 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
     if (!username || !firstName || !lastName) return;
 
     const checkUsername = async () => {
-      console.log("🔹 Verificando se username existe:", username);
       try {
         const user = await findUserByUsername(username);
-        console.log("🔹 Resultado findUserByUsername:", user);
-
-        // Filtrar pelo username exato
         const matchedUser = user?.username === username ? user : null;
-        console.log("🔹 Matched user (exato):", matchedUser);
 
         if (matchedUser) {
           setUsernameExists(true);
           setExistingUserData(matchedUser);
 
-          // Preencher campos automaticamente se estiver vazio
-          reset(prev => ({
+          // Preencher campos automaticamente se estiverem vazios
+          reset((prev) => ({
             ...prev,
             email: prev.email || matchedUser.email || "",
             first_name: prev.first_name || matchedUser.first_name || "",
@@ -99,7 +93,9 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
             birthday: prev.birthday || matchedUser.birthday || "",
             phone: prev.phone || matchedUser.phone || "",
             address: prev.address || matchedUser.address || "",
-            username: matchedUser.username, // força o existente
+            bloodType: prev.bloodType || matchedUser.bloodType || "",
+            sex: prev.sex || matchedUser.sex || "",
+            username: matchedUser.username,
           }));
         } else {
           setUsernameExists(false);
@@ -113,94 +109,38 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
     checkUsername();
   }, [username, firstName, lastName, reset]);
 
-  // const onSubmit = async (formData: Inputs) => {
-  //   try {
-  //     if (type === "create") {
-  //       const { user, student } = await createUserAndStudent(formData);
-  //       console.log("✅ Student criado:", student);
-  //       alert(`Student ${user.username} criado com sucesso!`);
-  //     } else if (type === "update" && data) {
-  //       const { user, student } = await updateUserAndStudent(
-  //         formData,
-  //         data.user.id,
-  //         data.id
-  //       );
-  //       console.log("✅ Student atualizado:", student);
-  //       alert(`Student ${user.username} atualizado com sucesso!`);
-  //     }
-  //     if (onSuccess) onSuccess();
-  //   } catch (err) {
-  //     console.error("❌ Erro:", err);
-  //     alert("Erro ao salvar Student. Veja o console.");
-  //   }
-  // };
-// const onSubmit = async (formData: Inputs) => {
-//   try {
-//     if (type === "create") {
-//       if (existingUser) {
-//         // Caso já exista usuário → só cria Student vinculado
-//         const { student } = await createStudentWithExistingUser(formData, existingUser.id);
-//         console.log("✅ Student criado (usuário existente):", student);
-//         alert(`Aluno vinculado ao usuário ${existingUser.username}!`);
-//       } else {
-//         // Caso não exista usuário → cria User + Student
-//         const { user, student } = await createUserAndStudent(formData);
-//         console.log("✅ Student criado:", student);
-//         alert(`Aluno ${user.username} criado com sucesso!`);
-//       }
-//     } else if (type === "update" && data) {
-//       const { user, student } = await updateUserAndStudent(
-//         formData,
-//         data.user.id,
-//         data.id
-//       );
-//       console.log("✅ Student atualizado:", student);
-//       alert(`Aluno ${user.username} atualizado com sucesso!`);
-//     }
-
-//     if (onSuccess) onSuccess();
-//   } catch (err) {
-//     console.error("❌ Erro:", err);
-//     alert("Erro ao salvar Student. Veja o console.");
-//   }
-// };
-
-const onSubmit = async (formData: Inputs) => {
-  try {
-    if (type === "create") {
-      if (existingUserData) {
-        // Já existe usuário → só cria Student vinculado
-        const student = await createOrUpdateStudent(
+  const onSubmit = async (formData: Inputs) => {
+    try {
+      if (type === "create") {
+        if (existingUserData) {
+          const student = await createOrUpdateStudent(
+            formData,
+            existingUserData.id!,
+            "create"
+          );
+          console.log("✅ Student criado (usuário existente):", student);
+          alert(`Aluno vinculado ao usuário ${existingUserData.username}!`);
+        } else {
+          const { user, student } = await createUserAndStudent(formData);
+          console.log("✅ Student criado:", student);
+          alert(`Aluno ${user.username} criado com sucesso!`);
+        }
+      } else if (type === "update" && data) {
+        const { user, student } = await updateUserAndStudent(
           formData,
-          existingUserData.id!, // id do usuário existente
-          "create"
+          data.user.id,
+          data.id
         );
-        console.log("✅ Student criado (usuário existente):", student);
-        alert(`Aluno vinculado ao usuário ${existingUserData.username}!`);
-      } else {
-        // Não existe usuário → cria User + Student
-        const { user, student } = await createUserAndStudent(formData);
-        console.log("✅ Student criado:", student);
-        alert(`Aluno ${user.username} criado com sucesso!`);
+        console.log("✅ Student atualizado:", student);
+        alert(`Aluno ${user.username} atualizado com sucesso!`);
       }
-    } else if (type === "update" && data) {
-      // Atualiza User + Student juntos
-      const { user, student } = await updateUserAndStudent(
-        formData,
-        data.user.id,
-        data.id
-      );
-      console.log("✅ Student atualizado:", student);
-      alert(`Aluno ${user.username} atualizado com sucesso!`);
+
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error("❌ Erro ao salvar Student:", err);
+      alert("Erro ao salvar Student. Veja o console.");
     }
-
-    if (onSuccess) onSuccess();
-  } catch (err) {
-    console.error("❌ Erro ao salvar Student:", err);
-    alert("Erro ao salvar Student. Veja o console.");
-  }
-};
-
+  };
 
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
@@ -212,7 +152,6 @@ const onSubmit = async (formData: Inputs) => {
         Informações de Autentificação
       </span>
       <div className="flex flex-wrap justify-between items-center gap-4">
-        {/* Campo username escondido, mas ainda no form */}
         <input type="hidden" {...register("username")} />
 
         <InputField
@@ -233,10 +172,10 @@ const onSubmit = async (formData: Inputs) => {
         )}
       </div>
 
-      {/* Feedback do username apenas se já existir */}
       {usernameExists && (
         <p className="text-sm mt-1 text-red-500">
-          Username gerado ({username}) já existe — campos preenchidos automaticamente
+          Username gerado ({username}) já existe — campos preenchidos
+          automaticamente
         </p>
       )}
 
@@ -293,6 +232,7 @@ const onSubmit = async (formData: Inputs) => {
             className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
             {...register("bloodType")}
           >
+            <option value="">-- Selecione --</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -310,8 +250,10 @@ const onSubmit = async (formData: Inputs) => {
             className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
             {...register("sex")}
           >
+            <option value="">-- Selecione --</option>
             <option value="MALE">Masculino</option>
             <option value="FEMALE">Feminino</option>
+            <option value="OTHER">Outro</option>
           </select>
         </div>
 
