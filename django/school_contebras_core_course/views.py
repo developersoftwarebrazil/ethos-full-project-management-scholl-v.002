@@ -1,7 +1,9 @@
+from warnings import filters
 from django.shortcuts import render
 
 # Create your views here 
 from rest_framework import viewsets, status
+from rest_framework.filters import SearchFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -29,10 +31,27 @@ class UserViewSet(viewsets.ModelViewSet):
 class TeacherViewSet(viewsets.ModelViewSet):
     queryset = Teacher.objects.all().order_by('id')
     serializer_class = TeacherSerializer
+
+      # 🔹 habilita busca
+    filter_backends = [SearchFilter]
+    search_fields = [
+        "user__username",     # pesquisa pelo username
+        "user__first_name",   # pesquisa pelo nome
+        "user__last_name",    # pesquisa pelo sobrenome
+        "user__email",        # pesquisa pelo email
+    ]
 class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
+      # 🔹 habilita busca
+    filter_backends = [SearchFilter]
+    search_fields = [
+        "user__username",     # pesquisa pelo username
+        "user__first_name",   # pesquisa pelo nome
+        "user__last_name",    # pesquisa pelo sobrenome
+        "user__email",        # pesquisa pelo email
+    ]
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer

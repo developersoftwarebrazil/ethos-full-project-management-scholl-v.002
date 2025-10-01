@@ -86,6 +86,8 @@ kill_port 8000
 kill_port 3000
 kill_port 3001
 kill_port 3002
+kill_port 5432
+kill_port 5672
 kill_django_background
 
 echo "🔧 Parando containers existentes e limpando..."

@@ -48,10 +48,21 @@ type TeacherResponse = {
   results: Teacher[];
 };
 
-async function getTeachers(page: number = 1): Promise<TeacherResponse> {
+async function getTeachers(
+  page: number = 1,
+  search: string = ""
+): Promise<TeacherResponse> {
   try {
-    const res = await fetch(`${API_URL}/api/teachers/?page=${page}`, {
-        next: { revalidate: 60 }, // 1 minuto
+    const query = new URLSearchParams();
+    query.set("page", page.toString());
+    if (search) query.set("search", search); // Django DRF já entende search=xxx
+
+    // const res = await fetch(`${API_URL}/api/teachers/?page=${page}`, {
+    //     next: { revalidate: 60 }, // 1 minuto
+    // });
+
+    const res = await fetch(`${API_URL}/api/teachers/?${query.toString()}`, {
+      next: { revalidate: 60 }, // 1 minuto
     });
     if (!res.ok) throw new Error("Erro ao buscar professores");
     return res.json();
@@ -69,10 +80,12 @@ async function getTeachers(page: number = 1): Promise<TeacherResponse> {
 export default async function TeacherListPage({
   searchParams,
 }: {
-  searchParams?: { page: string };
+  searchParams?: { page?: string, search?: string };
 }) {
   const page = searchParams?.page ? parseInt(searchParams.page) : 1;
-  const { results, count } = await getTeachers(page);
+  const search = searchParams?.search || "";
+
+  const { results, count } = await getTeachers(page, search);
   const totalPages = Math.ceil(count / ITEM_PER_PAGE); // se PAGE_SIZE = 10
   // const data = await getTeachers();
 

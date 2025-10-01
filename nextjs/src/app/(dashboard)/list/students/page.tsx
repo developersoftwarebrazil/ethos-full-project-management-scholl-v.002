@@ -44,11 +44,23 @@ type StudentResponse = {
   results: Student[];
 };
 
-async function getStudents(page: number = 1): Promise<StudentResponse> {
+async function getStudents(
+  page: number = 1,
+  search: string = ""
+): Promise<StudentResponse> {
   try {
-    const res = await fetch(`${API_URL}/api/students/?page=${page}`, {
+    const query = new URLSearchParams();
+    query.set("page", page.toString());
+    if (search) query.set("search", search); // Django DRF já entende search=xxx
+
+    // const res = await fetch(`${API_URL}/api/students/?page=${page}`, {
+    //   next: { revalidate: 60 }, // 1 minuto
+    // });
+
+        const res = await fetch(`${API_URL}/api/teachers/?${query.toString()}`, {
       next: { revalidate: 60 }, // 1 minuto
     });
+
     if (!res.ok) throw new Error("Erro ao buscar alunos");
     return res.json();
   } catch (error) {
@@ -65,10 +77,12 @@ async function getStudents(page: number = 1): Promise<StudentResponse> {
 export default async function StudentListPage({
   searchParams,
 }: {
-  searchParams?: { page: string };
+  searchParams?: { page?: string; search?: string };
 }) {
   const page = searchParams?.page ? parseInt(searchParams.page) : 1;
-  const { results, count } = await getStudents(page);
+  const search = searchParams?.search || "";
+
+  const { results, count } = await getStudents(page, search);
   const totalPages = Math.ceil(count / ITEM_PER_PAGE); // se PAGE_SIZE = 10
   // const data = await getTeachers();
 
