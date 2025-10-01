@@ -24,6 +24,7 @@
     "react-calendar": "^5.0.0",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
+    "react-hot-toast": "^2.6.0",
     "react-toastify": "^10.0.5",
     "recharts": "^2.12.7",
     "shaka-player": "^4.16.1",

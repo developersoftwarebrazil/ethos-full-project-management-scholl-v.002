@@ -253,7 +253,6 @@ const StudentForm = ({ type, data, onSuccess }: BaseFormProps) => {
             <option value="">-- Selecione --</option>
             <option value="MALE">Masculino</option>
             <option value="FEMALE">Feminino</option>
-            <option value="OTHER">Outro</option>
           </select>
         </div>
 

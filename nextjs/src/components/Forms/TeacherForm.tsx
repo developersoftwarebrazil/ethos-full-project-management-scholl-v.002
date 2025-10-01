@@ -13,6 +13,7 @@ import {
   updateUserAndTeacher,
 } from "@/lib/api/workflows/teacher";
 import { UserData, Teacher } from "@/lib/types";
+import { formatDate } from "date-fns";
 
 type Inputs = {
   username: string;
@@ -42,7 +43,6 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
     setValue,
     watch,
@@ -55,7 +55,6 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
   useEffect(() => {
     if (data) {
       reset({
-        ...watch(),
         username: data.user?.username || "",
         email: data.user?.email || "",
         first_name: data.user?.first_name || "",
@@ -64,15 +63,15 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
         phone: data.user?.phone || "",
         address: data.user?.address || "",
         birthday: data.user.birthday || "",
-        sex: data.user.sex || "MALE",
-        bloodType: data.user.bloodType || "A+",
+        sex: data.user.sex || "",
+        bloodType: data.user.bloodType || "",
         hire_date: data.hire_date || "",
         // teaching_subjects: data.teaching_subjects?.map(s => s.subject_name) || [],
         // teaching_classrooms: data.teaching_classrooms?.map(c => c.classroom_name) || [],
         // supervised_classrooms: data.supervised_classrooms?.map(c => c.name) || [],
       });
     }
-  }, [data, reset, watch]);
+  }, [data, reset]);
 
   // 🔹 Auto username
   const firstName = watch("first_name");
@@ -86,13 +85,14 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
 
     const checkUsername = async () => {
       try {
-        const user = (await findUserByUsername(username)) as UserData | null;
+        const user = await findUserByUsername(username);
         const matchedUser = user?.username === username ? user : null;
 
         if (matchedUser) {
           setUsernameExists(true);
           setExistingUserData(matchedUser);
 
+          //Prencher com os campos automaticamente se exixteirem
           reset((prev) => ({
             ...prev,
             email: prev.email || matchedUser.email || "",
@@ -102,8 +102,8 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
             birthday: prev.birthday || matchedUser.birthday || "",
             phone: prev.phone || matchedUser.phone || "",
             address: prev.address || matchedUser.address || "",
-            bloodType: prev.bloodType || matchedUser.bloodType || "A+",
-            sex: prev.sex || matchedUser.sex || "MALE", // 🔹 ADICIONAR
+            bloodType: prev.bloodType || matchedUser.bloodType || "",
+            sex: prev.sex || matchedUser.sex || "", // 🔹 ADICIONAR
             username: matchedUser.username,
           }));
         } else {
@@ -121,28 +121,17 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
   // 🔹 Submissão do formulário
   const onSubmit = async (formData: Inputs) => {
     try {
-      // Normalizar campos opcionais
-      const payload = {
-        ...formData,
-        description: formData.description || "",
-        sex: formData.sex || "MALE",
-        bloodType: formData.bloodType || "A+",
-        birthday: formData.birthday || null,
-        hire_date: formData.hire_date || null,
-        phone: formData.phone || "",
-        address: formData.address || "",
-      };
       if (type === "create") {
         if (existingUserData) {
           const teacher = await createOrUpdateTeacher(
-            payload,
+            formatDate,
             existingUserData.id,
             "create"
           );
           console.log("✅ Teacher criado (usuário existente):", teacher);
           alert(`Professor vinculado ao usuário ${existingUserData.username}!`);
         } else {
-          const { user, teacher } = await createUserAndTeacher(payload);
+          const { user, teacher } = await createUserAndTeacher(formatDate);
           console.log("✅ Teacher criado:", teacher);
           alert(`Professor ${user.username} criado com sucesso!`);
         }
@@ -261,6 +250,7 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
             className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
             {...register("bloodType")}
           >
+            <option value="">-- Selecione --</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
             <option value="B+">B+</option>
@@ -279,6 +269,7 @@ const TeacherForm = ({ type, data, onSuccess }: BaseFormProps) => {
             className="ring-[1.5px] ring-gray-300 rounded-md w-full p-2"
             {...register("sex")}
           >
+            <option value="">-- Selecione --</option>
             <option value="MALE">Masculino</option>
             <option value="FEMALE">Feminino</option>
           </select>
