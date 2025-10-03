@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
 import { role } from "@/lib/data";
-import { Student } from "@/lib/files_to_delete/student_original";
+import { Student } from "@/lib/types";
 
 export default function StudentRow({ student }: { student: Student }) {
   return (
@@ -29,7 +29,7 @@ export default function StudentRow({ student }: { student: Student }) {
       </td>
 
       <td className="hidden md:table-cell">{student.user.id}</td>
-      <td className="hidden md:table-cell">{student.grade}</td>
+      <td className="hidden md:table-cell">{student.grade?.name || "-"}</td>
       <td className="hidden lg:table-cell">{student.user.phone || "-"}</td>
       <td className="hidden lg:table-cell">{student.user.address || "-"}</td>
       {/* <td className="hidden md:table-cell">{student.classroom}</td> */}

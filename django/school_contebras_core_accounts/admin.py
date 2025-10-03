@@ -12,8 +12,12 @@ class RoleAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ("username", "email", "get_roles")
+    list_display = ("username", "email", "first_name", "last_name", "phone", "description", "get_roles")
+    search_fields = ("username", "email", "first_name", "last_name", "phone")
+
     filter_horizontal = ("roles",)
+
+
 
     def get_roles(self, obj):
         return ", ".join([role.name for role in obj.roles.all()])

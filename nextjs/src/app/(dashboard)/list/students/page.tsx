@@ -57,7 +57,7 @@ async function getStudents(
     //   next: { revalidate: 60 }, // 1 minuto
     // });
 
-        const res = await fetch(`${API_URL}/api/teachers/?${query.toString()}`, {
+    const res = await fetch(`${API_URL}/api/students/?${query.toString()}`, {
       next: { revalidate: 60 }, // 1 minuto
     });
 
