@@ -14,6 +14,9 @@ const TeacherForm = dynamic(() => import("./TeacherForm"), {
 const StudentForm = dynamic(() => import("./StudentForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+const SubjectForm = dynamic(() => import("./SubjectForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 
 // Mapeamento de forms
 const forms: {
@@ -21,6 +24,7 @@ const forms: {
 } = {
   teacher: (props) => <TeacherForm {...props} />,
   student: (props) => <StudentForm {...props} />,
+  subject: (props) => <SubjectForm {...props} />,
   // Adicione outros forms se necessário
 };
 

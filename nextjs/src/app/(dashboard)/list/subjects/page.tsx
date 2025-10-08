@@ -1,80 +1,95 @@
-import FormModel from "@/components/Forms/FormModel";
+// app/list/subjects/page.tsx
 import Table from "@/components/Lists/Table";
 import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
-import { role, subjectsData } from "@/lib/data";
+import FormModel from "@/components/Forms/FormModel";
+import SubjectRow from "@/components/Lists/SubjectRow";
+import { Subject } from "@/lib/types/subject";
+import { role } from "@/lib/data";
+import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
-import Link from "next/link";
 
-type Subject = {
-  id: number;
-  name: string;
-  teachers: string[];
-};
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const columns = [
-  {
-    headers: "Subject names",
-    accessor: "name",
-    className: "hidden md:table-cell",
-  },
-
-  {
-    headers: "Teachers",
-    accessor: "teachers",
-    className: "hidden lg:table-cell",
-  },
-  { headers: "Actions", accessor: "action" },
+  { headers: "Nome / Descrição", accessor: "info" },
+  { headers: "Professores", accessor: "teachers", className: "hidden md:table-cell" },
+  { headers: "Ações", accessor: "action" },
 ];
-const SubjectsListPage = () => {
-  const renderRow = (item: Subject) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
-    >
-      <td className="hidden md:table-cell">{item.name}</td>
-      <td className="hidden md:table-cell">{item.teachers.join(",")}</td>
 
-      <td>
-        <div className="flex items-center gap-2">
-          <Link href={`/list/subjects/${item.id}`}>
-            <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaSky ">
-              <Image src="/view.png" alt="" width={16} height={16} />
-            </button>
-          </Link>
-          {role === "admin" && (
-            <FormModel table="subject" type="delete" id={item.id} />
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+type SubjectResponse = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Subject[];
+};
+
+async function getSubjects(
+  page: number = 1,
+  search: string = ""
+): Promise<SubjectResponse> {
+  try {
+    const query = new URLSearchParams();
+    query.set("page", page.toString());
+    if (search) query.set("search", search);
+
+    const res = await fetch(`${API_URL}/api/subjects/?${query.toString()}`, {
+      next: { revalidate: 60 }, // 1 minuto
+    });
+    if (!res.ok) throw new Error("Erro ao buscar subjects");
+    return res.json();
+  } catch (error) {
+    console.error(error);
+    return {
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    };
+  }
+}
+
+export default async function SubjectListPage({
+  searchParams,
+}: {
+  searchParams?: { page?: string; search?: string };
+}) {
+  const page = searchParams?.page ? parseInt(searchParams.page) : 1;
+  const search = searchParams?.search || "";
+
+  const { results, count } = await getSubjects(page, search);
+  const totalPages = Math.ceil(count / ITEM_PER_PAGE);
+
   return (
     <div className="flex-1 bg-white rounded-md p-4 m-4 mt-0">
-      {/*  TOP */}
+      {/* TOP */}
       <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">All Subjects</h1>
-        <div className="flex flex-col md:flex-row items-center w-full  gap-4 md:w-auto ">
+        <h1 className="hidden md:block text-lg font-semibold">
+          Todos as Matérias
+        </h1>
+        <div className="flex flex-col md:flex-row items-center w-full gap-4 md:w-auto">
           <TableSearcher />
           <div className="flex items-center gap-4 self-end">
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/filter.png" alt="" width={14} height={14} />
+              <Image src="/filter.png" alt="Filtrar" width={14} height={14} />
             </button>
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
-              <Image src="/sort.png" alt="" width={14} height={14} />
+              <Image src="/sort.png" alt="Ordenar" width={14} height={14} />
             </button>
-
             {role === "admin" && <FormModel table="subject" type="create" />}
           </div>
         </div>
       </div>
-      {/*  LIST */}
-      <Table columns={columns} renderRow={renderRow} data={subjectsData} />
 
-      {/*  PAGINATIION */}
-      <Pagination />
+      {/* LIST */}
+      <Table
+        columns={columns}
+        data={results}
+        renderRow={(subject) => <SubjectRow key={subject.id} subject={subject} />}
+      />
+
+      {/* PAGINATION */}
+      <Pagination currentPage={page} totalPages={totalPages} />
     </div>
   );
-};
-
-export default SubjectsListPage;
+}
