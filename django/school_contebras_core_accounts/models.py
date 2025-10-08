@@ -7,11 +7,15 @@ SEX_CHOICES = [
 ]
 
 BLOOD_TYPE_CHOICES = [
-    ('A+', 'A+'), ('A-', 'A-'),
-    ('B+', 'B-'), ('AB+', 'AB-'),
-    ('O+', 'O-'),
+    ("A+", "A+"),
+    ("A-", "A-"),
+    ("B+", "B+"),
+    ("B-", "B-"),  # <--- adicionado
+    ("O+", "O+"),
+    ("O-", "O-"),  # <--- adicionado
+    ("AB+", "AB+"),
+    ("AB-", "AB-"),
 ]
-
 
 class Role(models.Model):
     """
