@@ -178,12 +178,17 @@ class ClassroomAdmin(admin.ModelAdmin):
         return ", ".join([f"{t.user.first_name} {t.user.last_name}" for t in obj.teachers.all()])
     get_teachers.short_description = "Professores"
 
+
+@admin.register(Subject)
+class SubjectAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    filter_horizontal = ("teachers",)  # permite selecionar múltiplos professores
 # ========================
 # Registros simples
 # ========================
 admin.site.register(Course)
 admin.site.register(Grade)
-admin.site.register(Subject)
+# admin.site.register(Subject)
 admin.site.register(RegistrationClassroom)
 admin.site.register(Lesson)
 admin.site.register(Exam)
