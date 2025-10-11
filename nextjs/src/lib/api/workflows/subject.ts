@@ -12,6 +12,7 @@ const logWorkflow = (label: string, data: any) => {
  * Cria um subject e opcionalmente vincula professores
  * @param formData Objeto com name, description e array de teacherIds
  */
+
 export const createSubjectWorkflow = async (formData: {
   name: string;
   description?: string;

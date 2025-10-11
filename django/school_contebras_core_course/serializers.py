@@ -259,7 +259,6 @@ class SubjectSerializer(serializers.ModelSerializer):
         print("🟢 [CREATE] Payload recebido:", validated_data)
         print("🟢 [CREATE] Teachers IDs recebidos:", [t.id for t in teachers])
 
-        subject = Subject.objects.create(**validated_data)
         if teachers:
             subject.teachers.set(teachers)
             print(

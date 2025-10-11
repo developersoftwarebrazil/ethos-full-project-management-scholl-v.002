@@ -79,6 +79,7 @@ export default function SubjectForm({
 
   // Submissão do formulário
   const handleSubmit = async (e: React.FormEvent) => {
+    
     e.preventDefault();
     setLoading(true);
 
