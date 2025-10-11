@@ -1,6 +1,5 @@
-
 import { Role } from "./role";
-import { StudentClassroom, StudentSubject } from "./studentSubject";
+import { StudentClassroom, StudentSubject } from "./course";
 import { UserData } from "./userData";
 
 export type Student = {

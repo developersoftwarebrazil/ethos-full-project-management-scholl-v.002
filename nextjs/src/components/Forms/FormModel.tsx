@@ -17,7 +17,9 @@ const StudentForm = dynamic(() => import("./StudentForm"), {
 const SubjectForm = dynamic(() => import("./SubjectForm"), {
   loading: () => <h1>Loading...</h1>,
 });
-
+const CourseForm = dynamic(() => import("./CourseForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 // Mapeamento de forms
 const forms: {
   [key: string]: (props: BaseFormProps) => JSX.Element;
@@ -25,6 +27,7 @@ const forms: {
   teacher: (props) => <TeacherForm {...props} />,
   student: (props) => <StudentForm {...props} />,
   subject: (props) => <SubjectForm {...props} />,
+  course: (props) => <CourseForm {...props} />,
   // Adicione outros forms se necessário
 };
 
@@ -37,6 +40,7 @@ const FormModel = ({
   table:
     | "teacher"
     | "student"
+    | "course"
     | "subject"
     | "class"
     | "lesson"
