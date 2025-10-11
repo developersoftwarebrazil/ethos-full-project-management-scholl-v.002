@@ -25,9 +25,9 @@ const menuItems = [
         visible: ["admin", "teacher"],
       },
       {
-        icon: "/parent.png",
-        label: "Responsáveis",
-        href: "/list/parents",
+        icon: "/course.png",
+        label: "Cursos",
+        href: "/list/courses",
         visible: ["admin", "teacher"],
       },
       {

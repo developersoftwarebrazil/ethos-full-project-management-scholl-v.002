@@ -12,40 +12,43 @@ from django.utils.text import get_valid_filename
 # ===========================s
 
 SEX_CHOICES = [
-    ('MALE', 'Masculino'),
-    ('FEMALE', 'Feminino'),
+    ("MALE", "Masculino"),
+    ("FEMALE", "Feminino"),
 ]
 
 DAY_CHOICES = [
-    ('MONDAY', 'Segunda-feira'),
-    ('TUESDAY', 'Terça-feira'),
-    ('WEDNESDAY', 'Quarta-feira'),
-    ('THURSDAY', 'Quinta-feira'),
-    ('FRIDAY', 'Sexta-feira'),
+    ("MONDAY", "Segunda-feira"),
+    ("TUESDAY", "Terça-feira"),
+    ("WEDNESDAY", "Quarta-feira"),
+    ("THURSDAY", "Quinta-feira"),
+    ("FRIDAY", "Sexta-feira"),
 ]
 
 BLOOD_TYPE_CHOICES = [
-    ('A+', 'A+'),
-    ('A-', 'A-'),
-    ('B+', 'B+'),
-    ('B-', 'B-'),
-    ('AB+', 'AB+'),
-    ('AB-', 'AB-'),
-    ('O+', 'O+'),
-    ('O-', 'O-'),
+    ("A+", "A+"),
+    ("A-", "A-"),
+    ("B+", "B+"),
+    ("B-", "B-"),
+    ("AB+", "AB+"),
+    ("AB-", "AB-"),
+    ("O+", "O+"),
+    ("O-", "O-"),
 ]
+
+
 # ===========================
 # Função para upload seguro de arquivos
 # ===========================
 def file_name(instance, filename):
     sanitized_filename = get_valid_filename(filename)
     ext = os.path.splitext(sanitized_filename)[-1].lower()
-    allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf']
+    allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".pdf"]
     if ext not in allowed_extensions:
         raise ValueError(f"Extensão de arquivo '{ext}' não permitida.")
-    hash_object = hashlib.md5(f"{sanitized_filename}{time.time()}".encode('utf-8'))
+    hash_object = hashlib.md5(f"{sanitized_filename}{time.time()}".encode("utf-8"))
     hashed_filename = f"{hash_object.hexdigest()}{ext}"
-    return os.path.join('thumbnails/', hashed_filename)
+    return os.path.join("thumbnails/", hashed_filename)
+
 
 # ===========================
 # MODELOS ESCOLARES
@@ -55,16 +58,16 @@ def file_name(instance, filename):
 # ADMINS ok
 # ===========================
 
+
 class SchoolAdmin(models.Model):
-   # Também conectado ao User
+    # Também conectado ao User
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="admin_profile"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="admin_profile"
     )
 
     # Campos extras podem ser adicionados futuramente
     created_at = models.DateTimeField(default=timezone.now)
+
     class Meta:
         verbose_name = "Administrador"
         verbose_name_plural = "Administradores"
@@ -84,16 +87,19 @@ class Course(models.Model):
     def __str__(self):
         return self.titleCourse
 
+
 class Grade(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Série")
     description = models.TextField(verbose_name="Descrição da Série")
     subjects = models.ManyToManyField("Subject", related_name="grades", blank=True)
+
     class Meta:
         verbose_name = "Série"
         verbose_name_plural = "Séries"
 
     def __str__(self):
         return self.name
+
 
 # ===========================
 # Teacher Model ok
@@ -103,38 +109,35 @@ class Teacher(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="teacher_profile"
+        related_name="teacher_profile",
     )
     subjects = models.ManyToManyField(
-        'Subject',
-        related_name='teachers_for_admin',  # nome diferente para evitar conflito
+        "Subject",
+        related_name="teachers_for_admin",  # nome diferente para evitar conflito
         blank=True,
-        verbose_name='Matérias'
+        verbose_name="Matérias",
     )
-     # Dados profissionais
+    # Dados profissionais
     hire_date = models.DateField(verbose_name="Data de Contratação")
-    createdAt = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
-    
+    createdAt = models.DateTimeField(
+        default=timezone.now, verbose_name="Data de Criação"
+    )
+
     # subjects = models.ManyToManyField('Subject', related_name='teachers', verbose_name="Disciplinas")
 
     class Meta:
         verbose_name = "Professor"
         verbose_name_plural = "Professores"
-        ordering = ['id']
+        ordering = ["id"]
 
     def __str__(self):
-     return f"{self.user.first_name} {self.user.last_name}"
+        return f"{self.user.first_name} {self.user.last_name}"
+
 
 class Subject(models.Model):
-    name = models.CharField(
-        max_length=150,
-        unique=True,
-        verbose_name="Nome da Matéria"
-    )
+    name = models.CharField(max_length=150, unique=True, verbose_name="Nome da Matéria")
     description = models.TextField(
-        verbose_name="Descrição da Matéria",
-        blank=True,
-        null=True
+        verbose_name="Descrição da Matéria", blank=True, null=True
     )
 
     # Relação 1:N com Lesson (Lesson deve ter ForeignKey para Subject)
@@ -155,38 +158,65 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
+
 class Classroom(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Turma')
-    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name='classrooms', verbose_name='Série')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='classrooms', verbose_name='Curso')
-    supervisor = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, related_name='supervised_classrooms', verbose_name='Supervisor')
-    teachers = models.ManyToManyField(Teacher, related_name='classrooms', blank=True, verbose_name='Professores')
+    name = models.CharField(max_length=100, verbose_name="Turma")
+    grade = models.ForeignKey(
+        Grade, on_delete=models.CASCADE, related_name="classrooms", verbose_name="Série"
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="classrooms",
+        verbose_name="Curso",
+    )
+    supervisor = models.ForeignKey(
+        Teacher,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="supervised_classrooms",
+        verbose_name="Supervisor",
+    )
+    teachers = models.ManyToManyField(
+        Teacher, related_name="classrooms", blank=True, verbose_name="Professores"
+    )
 
     class Meta:
         verbose_name = "Turma"
         verbose_name_plural = "Turmas"
 
     def __str__(self):
-        return f'Turma {self.name} - {self.course.titleCourse}'
+        return f"Turma {self.name} - {self.course.titleCourse}"
 
 
 class Student(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="student_profile"
+        related_name="student_profile",
     )
-    createdAt = models.DateTimeField(default=timezone.now, verbose_name='Criado em')
-    
-     # Relacionamentos acadêmicos
-    classroom = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, related_name="students", verbose_name='Turma')
-    grade = models.ForeignKey(Grade, on_delete=models.SET_NULL, null=True, related_name="students", verbose_name='Série')
+    createdAt = models.DateTimeField(default=timezone.now, verbose_name="Criado em")
 
+    # Relacionamentos acadêmicos
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="students",
+        verbose_name="Turma",
+    )
+    grade = models.ForeignKey(
+        Grade,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="students",
+        verbose_name="Série",
+    )
 
     # Relacionamentos (equivalentes a Attendance[] e Result[])
     # Student -> Attendance (One-to-Many)
     # Student -> Result (One-to-Many)
-    # No Django isso será representado nos modelos Attendance e Result, 
+    # No Django isso será representado nos modelos Attendance e Result,
     # cada um com ForeignKey(Student).
 
     class Meta:
@@ -211,7 +241,6 @@ class RegistrationClassroom(models.Model):
     def __str__(self):
         return f"{self.student.user.first_name} - {self.classroom.name}"
 
-
     def can_access(self, video):
         if not self.last_monthly_date:
             return False
@@ -221,7 +250,9 @@ class RegistrationClassroom(models.Model):
 
 class Lesson(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Aula")
-    day = models.CharField(max_length=15, choices=DAY_CHOICES, verbose_name="Dia da Semana")
+    day = models.CharField(
+        max_length=15, choices=DAY_CHOICES, verbose_name="Dia da Semana"
+    )
     start_time = models.TimeField(verbose_name="Hora de Início")
     end_time = models.TimeField(verbose_name="Hora de Término")
 
@@ -229,19 +260,19 @@ class Lesson(models.Model):
         "Subject",
         on_delete=models.CASCADE,
         related_name="lessons",
-        verbose_name="Matéria"
+        verbose_name="Matéria",
     )
     class_ref = models.ForeignKey(
         "Classroom",
         on_delete=models.CASCADE,
         related_name="lessons",
-        verbose_name="Turma"
+        verbose_name="Turma",
     )
     teacher = models.ForeignKey(
         "Teacher",
         on_delete=models.CASCADE,
         related_name="lessons",
-        verbose_name="Professor"
+        verbose_name="Professor",
     )
 
     class Meta:
@@ -251,11 +282,12 @@ class Lesson(models.Model):
     def __str__(self):
         return f"{self.name} - {self.subject.name}"
 
+
 class Exam(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name='Aula')
-    title = models.CharField(max_length=150, verbose_name='Título da Prova')
-    date = models.DateField(verbose_name='Data da Prova')
-    max_score = models.IntegerField(verbose_name='Pontuação Máxima')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name="Aula")
+    title = models.CharField(max_length=150, verbose_name="Título da Prova")
+    date = models.DateField(verbose_name="Data da Prova")
+    max_score = models.IntegerField(verbose_name="Pontuação Máxima")
 
     class Meta:
         verbose_name = "Prova"
@@ -266,11 +298,11 @@ class Exam(models.Model):
 
 
 class Assignment(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name='Aula')
-    title = models.CharField(max_length=150, verbose_name='Título da Atividade')
-    description = models.TextField(verbose_name='Descrição da Atividade')
-    due_date = models.DateField(verbose_name='Data de Entrega')
-    max_score = models.IntegerField(verbose_name='Pontuação Máxima')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name="Aula")
+    title = models.CharField(max_length=150, verbose_name="Título da Atividade")
+    description = models.TextField(verbose_name="Descrição da Atividade")
+    due_date = models.DateField(verbose_name="Data de Entrega")
+    max_score = models.IntegerField(verbose_name="Pontuação Máxima")
 
     class Meta:
         verbose_name = "Atividade"
@@ -279,12 +311,13 @@ class Assignment(models.Model):
     def __str__(self):
         return self.title
 
+
 class ExamResult(models.Model):
-    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name='Prova')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Aluno')
-    score = models.IntegerField(verbose_name='Pontuação')
-    graded_at = models.DateTimeField(auto_now_add=True, verbose_name='Data de Correção')
-    feedback = models.TextField(blank=True, verbose_name='Feedback')
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name="Prova")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Aluno")
+    score = models.IntegerField(verbose_name="Pontuação")
+    graded_at = models.DateTimeField(auto_now_add=True, verbose_name="Data de Correção")
+    feedback = models.TextField(blank=True, verbose_name="Feedback")
 
     class Meta:
         verbose_name = "Nota da Prova"
@@ -293,12 +326,17 @@ class ExamResult(models.Model):
     def __str__(self):
         return f"{self.student.user.first_name} - {self.exam.title}"
 
+
 class AssignmentResult(models.Model):
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, verbose_name='Atividade')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Aluno')
-    score = models.IntegerField(verbose_name='Pontuação')
-    submitted_at = models.DateTimeField(auto_now_add=True, verbose_name='Data de Entrega')
-    feedback = models.TextField(blank=True, verbose_name='Feedback')
+    assignment = models.ForeignKey(
+        Assignment, on_delete=models.CASCADE, verbose_name="Atividade"
+    )
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Aluno")
+    score = models.IntegerField(verbose_name="Pontuação")
+    submitted_at = models.DateTimeField(
+        auto_now_add=True, verbose_name="Data de Entrega"
+    )
+    feedback = models.TextField(blank=True, verbose_name="Feedback")
 
     class Meta:
         verbose_name = "Resultado da Atividade"
@@ -307,11 +345,16 @@ class AssignmentResult(models.Model):
     def __str__(self):
         return f"{self.student.user.first_name} - {self.assignment.title}"
 
+
 class Attendance(models.Model):
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name='Aula')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Aluno')
-    status = models.CharField(max_length=10, choices=[("present", "Presente"), ("absent", "Ausente")], verbose_name='Status')
-    date = models.DateField(default=timezone.now, verbose_name='Data')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name="Aula")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Aluno")
+    status = models.CharField(
+        max_length=10,
+        choices=[("present", "Presente"), ("absent", "Ausente")],
+        verbose_name="Status",
+    )
+    date = models.DateField(default=timezone.now, verbose_name="Data")
 
     class Meta:
         verbose_name = "Frequência"
@@ -319,6 +362,7 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.student.user.first_name} - {self.lesson.name} - {self.status}"
+
 
 class Event(models.Model):
     title = models.CharField(max_length=255, verbose_name="Título do Evento")
@@ -332,7 +376,7 @@ class Event(models.Model):
         null=True,
         blank=True,
         related_name="events",
-        verbose_name="Turma"
+        verbose_name="Turma",
     )
 
     class Meta:
@@ -341,6 +385,7 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Announcement(models.Model):
     title = models.CharField(max_length=255, verbose_name="Título do Aviso")
@@ -353,7 +398,7 @@ class Announcement(models.Model):
         null=True,
         blank=True,
         related_name="announcements",
-        verbose_name="Turma"
+        verbose_name="Turma",
     )
 
     class Meta:
