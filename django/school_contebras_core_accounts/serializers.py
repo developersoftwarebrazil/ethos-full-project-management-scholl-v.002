@@ -22,14 +22,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
 
+        # Certifique-se de obter o usuário corretamente
+        user = self.user if hasattr(self, 'user') and self.user is not None else User.objects.get(username=attrs.get('username'))
+
         # Adiciona campos extras na resposta
-        data['username'] = self.user.username
-        data['email'] = self.user.email
-        data['description'] = self.user.description
-        data['sex'] = self.user.sex
-        data['bloodType'] = self.user.bloodType
-        data['birthday'] = self.user.birthday
-        data['roles'] = [role.name for role in self.user.roles.all()]
+        data['username'] = user.username
+        data['email'] = user.email
+        data['description'] = getattr(user, 'description', "")
+        data['sex'] = getattr(user, 'sex', "")
+        data['bloodType'] = str(getattr(user, 'bloodType', "")) if getattr(user, 'bloodType', None) is not None else ""
+        data['birthday'] = str(getattr(user, 'birthday', "")) if getattr(user, 'birthday', None) is not None else ""
+        # Use the correct related name if roles are linked via a relationship
+        data['roles'] = ', '.join([role.name for role in getattr(user, 'roles', Role.objects.none()).all()])
 
         return data
 class UserSerializer(serializers.ModelSerializer):
@@ -52,5 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
             'birthday',
             "img",
         ]
+
     def get_roles(self, obj):
-        return [role.name for role in obj.roles.all()]
+        # Use the correct related name if roles are linked via a relationship
+        return [role.name for role in getattr(obj, 'roles', Role.objects.none()).all()]

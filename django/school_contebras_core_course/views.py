@@ -64,6 +64,10 @@ class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
 
+    def perform_create(self, serializer):
+        subject = serializer.save()
+        # se quiser alguma lógica adicional, coloque aqui
+        return subject
 
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.select_related("subject", "class_ref", "teacher").all()

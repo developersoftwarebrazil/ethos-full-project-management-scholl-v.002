@@ -83,7 +83,9 @@ export default function SubjectForm({
     setLoading(true);
 
     try {
-      const payload = { name, description, teachers_ids: teacherIds };
+      const payload = { name, description, teacherIds };
+      console.log("🟡 Enviando payload para API:");
+console.log(JSON.stringify(payload, null, 2));
       if (type === "create") {
         await createSubjectWorkflow(payload);
         console.log("Criou", payload);

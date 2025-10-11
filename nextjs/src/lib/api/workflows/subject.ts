@@ -2,6 +2,12 @@
 import { Subject } from "@/lib/types/subject";
 import { createSubject, updateSubject } from "../subjects";
 
+// Helper simples para logs
+const logWorkflow = (label: string, data: any) => {
+  console.log(`🧩 [WORKFLOW - ${label}]`);
+  console.log(JSON.stringify(data, null, 2));
+};
+
 /**
  * Cria um subject e opcionalmente vincula professores
  * @param formData Objeto com name, description e array de teacherIds
@@ -11,11 +17,17 @@ export const createSubjectWorkflow = async (formData: {
   description?: string;
   teacherIds?: number[];
 }): Promise<Subject> => {
-  const subject = await createSubject({
+  const payload = {
     name: formData.name,
     description: formData.description,
-    teachers: formData.teacherIds,
-  });
+    teacher_ids: formData.teacherIds ?? [],
+  };
+
+  logWorkflow("createSubjectWorkflow - Payload enviado", payload);
+
+  const subject = await createSubject(payload);
+
+  logWorkflow("createSubjectWorkflow - Resposta recebida", subject);
 
   return subject;
 };
@@ -33,11 +45,17 @@ export const updateSubjectWorkflow = async (
     teacherIds?: number[];
   }
 ): Promise<Subject> => {
-  const subject = await updateSubject(subjectId, {
+  const payload = {
     name: formData.name,
     description: formData.description,
-    teachers: formData.teacherIds,
-  });
+    teacher_ids: formData.teacherIds ?? [],
+  };
+
+  logWorkflow(`updateSubjectWorkflow - Payload para ID ${subjectId}`, payload);
+
+  const subject = await updateSubject(subjectId, payload);
+
+  logWorkflow("updateSubjectWorkflow - Resposta recebida", subject);
 
   return subject;
 };
