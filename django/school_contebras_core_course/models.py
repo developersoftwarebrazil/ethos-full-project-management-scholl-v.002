@@ -57,8 +57,6 @@ def file_name(instance, filename):
 
 # ADMINS ok
 # ===========================
-
-
 class SchoolAdmin(models.Model):
     # Também conectado ao User
     user = models.OneToOneField(
@@ -75,18 +73,26 @@ class SchoolAdmin(models.Model):
     def __str__(self):
         return self.user.username
 
-
 class Course(models.Model):
     titleCourse = models.CharField(max_length=150, verbose_name="Título do curso")
     description = models.TextField(verbose_name="Descrição do curso")
 
-    class Meta:
-        verbose_name = "Curso"
-        verbose_name_plural = "Cursos"
+    subjects = models.ManyToManyField(
+        "Subject",
+        related_name="courses",
+        blank=True,
+        verbose_name="Matérias"
+    )
+
+    classrooms = models.ManyToManyField(
+        "Classroom",
+        related_name="courses_in_classrooms",
+        blank=True,
+        verbose_name="Turmas"
+    )
 
     def __str__(self):
         return self.titleCourse
-
 
 class Grade(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Série")
@@ -167,7 +173,7 @@ class Classroom(models.Model):
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
-        related_name="classrooms",
+        related_name="related_classrooms",
         verbose_name="Curso",
     )
     supervisor = models.ForeignKey(

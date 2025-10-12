@@ -3,32 +3,52 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 
-from .models import (
-    SchoolAdmin, Course, Grade, Teacher, Subject, Classroom, Student,
-    RegistrationClassroom, Lesson, Exam, Assignment,
-    ExamResult, AssignmentResult, Attendance, Event, Announcement
+from school_contebras_core_course.models import (
+    SchoolAdmin,
+    Course,
+    Grade,
+    Teacher,
+    Subject,
+    Classroom,
+    Student,
+    RegistrationClassroom,
+    Lesson,
+    Exam,
+    Assignment,
+    ExamResult,
+    AssignmentResult,
+    Attendance,
+    Event,
+    Announcement,
 )
 
 User = get_user_model()
 # ========================
 # SchoolAdmin
 # ========================
-
 @admin.register(SchoolAdmin)
 class SchoolAdminAdmin(admin.ModelAdmin):
     list_display = ("id", "get_username", "get_name", "get_email", "created_at")
-    search_fields = ("user__username", "user__first_name", "user__last_name", "user__email")
+    search_fields = (
+        "user__username",
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+    )
 
     def get_username(self, obj):
         return obj.user.username
+
     get_username.short_description = "Username"
 
     def get_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
+
     get_name.short_description = "Nome"
 
     def get_email(self, obj):
         return obj.user.email
+
     get_email.short_description = "Email"
 
 # ========================
@@ -46,7 +66,7 @@ class TeacherForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = getattr(self.instance, 'user', None)
+        user = getattr(self.instance, "user", None)
         if user:
             self.fields["description"].initial = user.description
             self.fields["phone"].initial = user.phone
@@ -57,9 +77,7 @@ class TeacherForm(forms.ModelForm):
         teacher = super().save(commit=False)
 
         if not teacher.user:
-            teacher.user = User.objects.create(
-                username=f'teacher_{int(time.time())}'
-            )
+            teacher.user = User.objects.create(username=f"teacher_{int(time.time())}")
 
         # Atualiza os campos do user
         teacher.user.description = self.cleaned_data.get("description")  # type: ignore
@@ -80,10 +98,16 @@ class TeacherForm(forms.ModelForm):
 class TeacherAdmin(admin.ModelAdmin):
     form = TeacherForm
 
-
     list_display = (
-        "id", "get_username", "get_name", "get_email", "get_phone",
-        "get_sex", "get_bloodType", "get_birthday", "hire_date"
+        "id",
+        "get_username",
+        "get_name",
+        "get_email",
+        "get_phone",
+        "get_sex",
+        "get_bloodType",
+        "get_birthday",
+        "hire_date",
     )
 
     filter_horizontal = ("subjects",)
@@ -97,30 +121,37 @@ class TeacherAdmin(admin.ModelAdmin):
 
     def get_username(self, obj):
         return obj.user.username
+
     get_username.short_description = "Username"
 
     def get_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
+
     get_name.short_description = "Nome"
 
     def get_email(self, obj):
         return obj.user.email
+
     get_email.short_description = "Email"
 
     def get_phone(self, obj):
         return obj.user.phone
+
     get_phone.short_description = "Telefone"
 
     def get_sex(self, obj):
         return obj.user.get_sex_display() if obj.user.sex else "-"
+
     get_sex.short_description = "Sexo"
 
     def get_bloodType(self, obj):
         return obj.user.bloodType or "-"
+
     get_bloodType.short_description = "Tipo Sanguíneo"
 
     def get_birthday(self, obj):
         return obj.user.birthday or "-"
+
     get_birthday.short_description = "Nascimento"
 
 # ========================
@@ -129,35 +160,51 @@ class TeacherAdmin(admin.ModelAdmin):
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     list_display = (
-        "id", "get_username", "get_name", "get_email",
-        "get_sex", "get_bloodType", "get_birthday",
-        "classroom", "grade"
+        "id",
+        "get_username",
+        "get_name",
+        "get_email",
+        "get_sex",
+        "get_bloodType",
+        "get_birthday",
+        "classroom",
+        "grade",
     )
-    search_fields = ("user__username", "user__first_name", "user__last_name", "user__email")
+    search_fields = (
+        "user__username",
+        "user__first_name",
+        "user__last_name",
+        "user__email",
+    )
 
     def get_username(self, obj):
         return obj.user.username
+
     get_username.short_description = "Username"
 
     def get_name(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
+
     get_name.short_description = "Nome"
 
     def get_email(self, obj):
         return obj.user.email
+
     get_email.short_description = "Email"
 
-    
     def get_sex(self, obj):
         return obj.user.get_sex_display() if obj.user.sex else "-"
+
     get_sex.short_description = "Sexo"
 
     def get_bloodType(self, obj):
         return obj.user.bloodType or "-"
+
     get_bloodType.short_description = "Tipo Sanguíneo"
 
     def get_birthday(self, obj):
         return obj.user.birthday or "-"
+
     get_birthday.short_description = "Nascimento"
 
 # ========================
@@ -171,24 +218,42 @@ class ClassroomAdmin(admin.ModelAdmin):
     filter_horizontal = ("teachers",)
 
     def get_supervisor(self, obj):
-        return f"{obj.supervisor.user.first_name} {obj.supervisor.user.last_name}" if obj.supervisor else "-"
+        return (
+            f"{obj.supervisor.user.first_name} {obj.supervisor.user.last_name}"
+            if obj.supervisor
+            else "-"
+        )
+
     get_supervisor.short_description = "Supervisor"
 
     def get_teachers(self, obj):
-        return ", ".join([f"{t.user.first_name} {t.user.last_name}" for t in obj.teachers.all()])
-    get_teachers.short_description = "Professores"
+        return ", ".join(
+            [f"{t.user.first_name} {t.user.last_name}" for t in obj.teachers.all()]
+        )
 
+    get_teachers.short_description = "Professores"
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ("name",)
     filter_horizontal = ("teachers",)  # permite selecionar múltiplos professores
+
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ("titleCourse", "description")
+    search_fields = ("titleCourse", "description")
+    filter_horizontal = ["subjects", "classrooms"]
+
+    fieldsets = (
+        ("Informações do Curso", {"fields": ("titleCourse", "description")}),
+        ("Relacionamentos", {"fields": ("subjects", "classrooms")}),
+    )
+
 # ========================
 # Registros simples
 # ========================
-admin.site.register(Course)
+# admin.site.register(Course)
 admin.site.register(Grade)
-# admin.site.register(Subject)
 admin.site.register(RegistrationClassroom)
 admin.site.register(Lesson)
 admin.site.register(Exam)
