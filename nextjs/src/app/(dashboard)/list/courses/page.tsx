@@ -14,7 +14,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const columns = [
   { headers: "Título / Descrição", accessor: "info" },
   { headers: "Turmas", accessor: "classrooms", className: "hidden md:table-cell" },
-  { headers: "Disciplinas", accessor: "subjects", className: "hidden md:table-cell" },
+  { headers: "Matérias", accessor: "subjects", className: "hidden md:table-cell" },
   { headers: "Ações", accessor: "action" },
 ];
 

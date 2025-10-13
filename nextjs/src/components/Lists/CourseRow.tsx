@@ -17,9 +17,12 @@ export default function CourseRow({ course }: { course: Course }) {
         <p className="text-xs text-gray-500">{course.description}</p>
       </td>
 
-      <td className="hidden md:table-cell">{course.id}</td>
-      <td className="hidden md:table-cell">{course.classrooms.length}</td>
-      <td className="hidden md:table-cell">{course.subjects.length}</td>
+    {/* Turmas  */}
+      {/* <td className="hidden md:table-cell">{course.classrooms?.length ?? 0}</td> */}
+      <td className="hidden md:table-cell">{course.classrooms?.map(classroom => classroom.name).join(", ")}</td>
+      {/* Disciplinas */}
+      {/* <td className="hidden md:table-cell">{course.subjects?.length ?? 0}</td> */}
+      <td className="hidden md:table-cell">{course.subjects?.map(subject => subject.name).join(", ")}</td>
 
       {/* Ações */}
       <td>
