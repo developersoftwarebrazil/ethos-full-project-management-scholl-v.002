@@ -94,17 +94,44 @@ class Course(models.Model):
     def __str__(self):
         return self.titleCourse
 
+# class Grade(models.Model):
+#     level = models.PositiveIntegerField(unique=True, verbose_name="Nível / Série")
+#     name = models.CharField(max_length=150, verbose_name="Nome da Série")
+#     description = models.TextField(blank=True, null=True, verbose_name="Descrição da Série")
+#     subjects = models.ManyToManyField("Subject", related_name="grades", blank=True)
+    
+#     class Meta:
+#         verbose_name = "Série"
+#         verbose_name_plural = "Séries"
+#         ordering = ["level"]
+
+#     def __str__(self):
+#         return f"{self.level}º Ano - {self.name}"
+
 class Grade(models.Model):
+    level = models.PositiveIntegerField(
+        unique=True,
+        verbose_name="Nível / Série",
+        help_text="Número identificador da série (ex: 1 = 1º ano, 2 = 2º ano)"
+    )
     name = models.CharField(max_length=150, verbose_name="Nome da Série")
-    description = models.TextField(verbose_name="Descrição da Série")
-    subjects = models.ManyToManyField("Subject", related_name="grades", blank=True)
+    description = models.TextField(blank=True, null=True, verbose_name="Descrição da Série")
+    
+    # Disciplinas associadas à série
+    subjects = models.ManyToManyField(
+        "Subject",
+        related_name="grades",
+        blank=True,
+        verbose_name="Matérias"
+    )
 
     class Meta:
         verbose_name = "Série"
         verbose_name_plural = "Séries"
+        ordering = ["level"]
 
     def __str__(self):
-        return self.name
+        return f"{self.level}º Ano - {self.name}"
 
 
 # ===========================

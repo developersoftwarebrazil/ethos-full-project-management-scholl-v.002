@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Lesson, Subject, Teacher, Student, Course, Classroom
+from .models import Grade, Lesson, Subject, Teacher, Student, Course, Classroom
 from school_contebras_core_accounts.models import User, Role
 
 
@@ -348,3 +348,9 @@ class CourseSerializer(serializers.ModelSerializer):
 
         subjects = Subject.objects.filter(id__in=subject_ids).distinct()
         return SubjectSerializer(subjects, many=True, read_only=True).data
+
+class GradeSerializer(serializers.ModelSerializer):
+    subjects = SubjectSerializer(many=True, read_only=True)
+    class Meta:
+        model = Grade
+        fields = ['id', 'level', 'name', 'description', 'subjects']

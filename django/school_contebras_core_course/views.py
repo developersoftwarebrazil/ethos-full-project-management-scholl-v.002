@@ -8,8 +8,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from school_contebras_core_accounts.models import User, Role
-from .models import Lesson, Subject, Teacher,Student, Course, Classroom
-from .serializers import LessonSerializer, SubjectSerializer, TeacherSerializer,StudentSerializer, CourseSerializer, ClassroomSerializer, UserSerializer
+from .models import Grade, Lesson, Subject, Teacher,Student, Course, Classroom
+from .serializers import GradeSerializer, LessonSerializer, SubjectSerializer, TeacherSerializer,StudentSerializer, CourseSerializer, ClassroomSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -72,3 +72,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
 class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.select_related("subject", "class_ref", "teacher").all()
     serializer_class = LessonSerializer
+
+class GradeViewSet(viewsets.ModelViewSet):
+    queryset = Grade.objects.all().order_by('level')
+    serializer_class = GradeSerializer

@@ -248,12 +248,35 @@ class CourseAdmin(admin.ModelAdmin):
         ("Informações do Curso", {"fields": ("titleCourse", "description")}),
         ("Relacionamentos", {"fields": ("subjects", "classrooms")}),
     )
+@admin.register(Grade)
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ("level", "name", "get_subjects", "get_classrooms", "get_students")
+    search_fields = ("name",)
+    ordering = ("level",)
+    filter_horizontal = ("subjects",)
+
+    fieldsets = (
+        ("Informações da Série", {"fields": ("level", "name", "description")}),
+        ("Disciplinas", {"fields": ("subjects",)}),
+    )
+
+    def get_subjects(self, obj):
+        return ", ".join([s.name for s in obj.subjects.all()]) or "-"
+    get_subjects.short_description = "Matérias"
+
+    def get_classrooms(self, obj):
+        return ", ".join([c.name for c in obj.classrooms.all()]) or "-"
+    get_classrooms.short_description = "Turmas"
+
+    def get_students(self, obj):
+        return obj.students.count()
+    get_students.short_description = "Qtd. de Alunos"
 
 # ========================
 # Registros simples
 # ========================
 # admin.site.register(Course)
-admin.site.register(Grade)
+# admin.site.register(Grade)
 admin.site.register(RegistrationClassroom)
 admin.site.register(Lesson)
 admin.site.register(Exam)
