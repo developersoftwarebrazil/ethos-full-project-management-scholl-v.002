@@ -9,7 +9,12 @@ import { Grade } from "../types/grade";
  * - Use NEXT_PUBLIC_API_URL no .env.local para configurar corretamente.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+ const API_URL =
+    typeof window === "undefined"
+      ? process.env.NEXT_PUBLIC_API_URL
+      : "http://localhost:8000/api";
+
 
 async function parseJsonSafe(res: Response) {
   const text = await res.text();

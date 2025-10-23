@@ -105,3 +105,8 @@ export const deleteSubject = async (id: number): Promise<void> => {
 
   console.log(`✅ Subject ${id} deletado com sucesso.`);
 };
+// Helper simples para buscar todos os subjects (sem paginação)
+export const getSubjects = async (): Promise<Subject[]> => {
+  const response = await fetchSubjects(1, 100); // traz os 100 primeiros
+  return response.results || [];
+};
