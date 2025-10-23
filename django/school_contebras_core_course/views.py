@@ -74,5 +74,5 @@ class LessonViewSet(viewsets.ModelViewSet):
     serializer_class = LessonSerializer
 
 class GradeViewSet(viewsets.ModelViewSet):
-    queryset = Grade.objects.all().order_by('level')
+    queryset = Grade.objects.all().order_by('level').prefetch_related('subjects')
     serializer_class = GradeSerializer

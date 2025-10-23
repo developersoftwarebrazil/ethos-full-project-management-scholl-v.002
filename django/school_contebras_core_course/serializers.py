@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db import models
 from .models import Grade, Lesson, Subject, Teacher, Student, Course, Classroom
 from school_contebras_core_accounts.models import User, Role
 
@@ -131,7 +132,6 @@ class TeacherSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-
 # ===============================
 # Student
 # ===============================
@@ -203,7 +203,6 @@ class StudentSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
 
 # ===============================
 # Subject
@@ -317,10 +316,10 @@ class LessonSerializer(serializers.ModelSerializer):
 # ===============================
 # Course COMPLETO
 # ===============================
+
+
 class CourseSerializer(serializers.ModelSerializer):
     classrooms = ClassroomSerializer(many=True, read_only=True)
-
-    # Todas as disciplinas que fazem parte das turmas deste curso
     subjects = serializers.SerializerMethodField()
 
     class Meta:
@@ -335,22 +334,38 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def get_subjects(self, obj):
         """
-        Retorna todas as disciplinas relacionadas às turmas do curso,
-        com professores que lecionam cada disciplina.
+        Retorna todas as disciplinas relacionadas ao curso,
+        vindas das aulas (Lesson) e dos professores das turmas.
         """
-        # Pega todas as turmas do curso
         classrooms = obj.classrooms.all()
-        # Pega todas as disciplinas dessas turmas
         subject_ids = set()
-        for classroom in classrooms:
-            for lesson in classroom.lessons.all():
-                subject_ids.add(lesson.subject.id)
+        teacher_ids = set()
 
-        subjects = Subject.objects.filter(id__in=subject_ids).distinct()
+        for classroom in classrooms:
+            # matérias das aulas (Lesson)
+            for lesson in classroom.lessons.all():
+                if lesson.subject:
+                    subject_ids.add(lesson.subject.id)
+
+            # matérias ensinadas pelos professores das turmas
+            if classroom.supervisor:
+                teacher_ids.add(classroom.supervisor.id)
+
+        # busca matérias tanto pelas aulas quanto pelos professores
+        subjects = Subject.objects.filter(
+            models.Q(id__in=subject_ids) | models.Q(teachers__id__in=teacher_ids)
+        ).distinct()
+
         return SubjectSerializer(subjects, many=True, read_only=True).data
 
 class GradeSerializer(serializers.ModelSerializer):
     subjects = SubjectSerializer(many=True, read_only=True)
+    subject_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.all(),
+        many=True,
+        source="subjects",
+        write_only=True
+    )
     class Meta:
         model = Grade
-        fields = ['id', 'level', 'name', 'description', 'subjects']
+        fields = ['id', 'level', 'name', 'description', 'subjects', 'subject_ids']

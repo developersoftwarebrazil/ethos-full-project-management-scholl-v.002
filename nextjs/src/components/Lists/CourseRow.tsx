@@ -1,9 +1,9 @@
-// src/components/Lists/CourseRow.tsx
+// components/Lists/CourseRow.tsx
 import Image from "next/image";
 import Link from "next/link";
 import FormModel from "@/components/Forms/FormModel";
 import { role } from "@/lib/data";
-import { Course } from "@/lib/types";
+import { Course } from "@/lib/types/course";
 
 export default function CourseRow({ course }: { course: Course }) {
   return (
@@ -17,12 +17,31 @@ export default function CourseRow({ course }: { course: Course }) {
         <p className="text-xs text-gray-500">{course.description}</p>
       </td>
 
-    {/* Turmas  */}
-      {/* <td className="hidden md:table-cell">{course.classrooms?.length ?? 0}</td> */}
-      <td className="hidden md:table-cell">{course.classrooms?.map(classroom => classroom.name).join(", ")}</td>
+      {/* Turmas */}
+      <td className="hidden md:table-cell">
+        {course.classrooms?.length > 0 ? (
+          course.classrooms.map((c) => (
+            <div key={c.id} className="mb-1 uppercase">
+              <strong>{c.name}</strong> — {c.grade}ª turma
+              {c.supervisor && (
+                <span className="block text-xs text-gray-500">
+                  Prof: {c.supervisor.user.first_name}{" "}
+                  {c.supervisor.user.last_name}
+                </span>
+              )}
+            </div>
+          ))
+        ) : (
+          <span className="text-gray-400">Nenhuma turma</span>
+        )}
+      </td>
+
       {/* Disciplinas */}
-      {/* <td className="hidden md:table-cell">{course.subjects?.length ?? 0}</td> */}
-      <td className="hidden md:table-cell">{course.subjects?.map(subject => subject.name).join(", ")}</td>
+      <td className="hidden md:table-cell lowercase ">
+        {course.subjects?.length > 0
+          ? course.subjects.map((s) => s.name).join(", ")
+          : "—"}
+      </td>
 
       {/* Ações */}
       <td>

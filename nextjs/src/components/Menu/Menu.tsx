@@ -30,6 +30,12 @@ const menuItems = [
         href: "/list/courses",
         visible: ["admin", "teacher"],
       },
+       {
+        icon: "/result.png",
+        label: "Séries",
+        href: "/list/grades",
+        visible: ["admin", "teacher"],
+      },
       {
         icon: "/subject.png",
         label: "Matérias",

@@ -27,16 +27,16 @@ export default function TeacherRow({ teacher }: { teacher: Teacher }) {
           className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
         />
         <div>
-          <h3 className="font-semibold">{teacher.user.first_name}</h3>
+          <h3 className="font-semibold uppercase ">{teacher.user.first_name}</h3>
           <p className="text-xs text-gray-500">{teacher.user.email}</p>
         </div>
       </td>
 
-      <td className="hidden md:table-cell">{teacher.user.username}</td>
-      <td className="hidden md:table-cell">
+      <td className="hidden md:table-cell lowercase">{teacher.user.username}</td>
+      <td className="hidden md:table-cell lowercase">
         {teacher.user.subjects?.join(", ") || "-"}
       </td>
-      <td className="hidden md:table-cell">
+      <td className="hidden md:table-cell lowercase">
         {formatClassrooms(teacher.supervised_classrooms)}
       </td>
       <td className="hidden md:table-cell">{teacher.user.phone}</td>

@@ -1,5 +1,6 @@
 // lib/api/subject.ts
-import { Subject, SubjectResponse } from "@/lib/types/subject";
+import { Subject } from "@/lib/types/subject";
+import { SubjectResponse } from "./subjectResponse";
 
 // Helper para logar dados com formatação
 const logApi = (label: string, data: any) => {

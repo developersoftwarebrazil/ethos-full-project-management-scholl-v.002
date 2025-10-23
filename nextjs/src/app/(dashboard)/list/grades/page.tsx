@@ -1,36 +1,48 @@
-// app/list/subjects/page.tsx
+// src/app/(dashboard)/list/grade/page.tsx
 import Table from "@/components/Lists/Table";
 import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
 import FormModel from "@/components/Forms/FormModel";
-import SubjectRow from "@/components/Lists/SubjectRow";
-import { Subject } from "@/lib/types/subject";
+import GradeRow from "@/components/Lists/GradeRow";
+import { Grade } from "@/lib/types/grade";
 import { role } from "@/lib/data";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
-import { SubjectResponse } from "@/lib/api/subjectResponse";
+import { GradeResponse } from "@/lib/api/gradeResponse";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const columns = [
-  { headers: "Nome / Descrição", accessor: "info" },
-  { headers: "Professores", accessor: "teachers", className: "hidden md:table-cell" },
+  { headers: "Info", accessor: "info" },
+  {
+    headers: "Nível",
+    accessor: "level",
+    className: "hidden md:table-cell",
+  },
+  {
+    headers: "Nome da Série",
+    accessor: "name",
+    className: "hidden md:table-cell",
+  },
+  {
+    headers: "Descrição",
+    accessor: "description",
+    className: "hidden lg:table-cell",
+  },
   { headers: "Ações", accessor: "action" },
 ];
 
-async function getSubjects(
-  page: number = 1,
-  search: string = ""
-): Promise<SubjectResponse> {
+async function getGrades(page: number = 1, search: string = ""): Promise<GradeResponse> {
   try {
     const query = new URLSearchParams();
     query.set("page", page.toString());
     if (search) query.set("search", search);
 
-    const res = await fetch(`${API_URL}/api/subjects/?${query.toString()}`, {
+    const res = await fetch(`${API_URL}/api/grades/?${query.toString()}`, {
       next: { revalidate: 60 }, // 1 minuto
     });
-    if (!res.ok) throw new Error("Erro ao buscar subjects");
+
+    if (!res.ok) throw new Error("Erro ao buscar séries (grades)");
     return res.json();
   } catch (error) {
     console.error(error);
@@ -43,7 +55,7 @@ async function getSubjects(
   }
 }
 
-export default async function SubjectListPage({
+export default async function GradeListPage({
   searchParams,
 }: {
   searchParams?: { page?: string; search?: string };
@@ -51,15 +63,15 @@ export default async function SubjectListPage({
   const page = searchParams?.page ? parseInt(searchParams.page) : 1;
   const search = searchParams?.search || "";
 
-  const { results, count } = await getSubjects(page, search);
+  const { results, count } = await getGrades(page, search);
   const totalPages = Math.ceil(count / ITEM_PER_PAGE);
 
   return (
     <div className="flex-1 bg-white rounded-md p-4 m-4 mt-0">
-      {/* TOP */}
+      {/* TOPO */}
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold">
-          Todos as Matérias
+          Todas as Séries
         </h1>
         <div className="flex flex-col md:flex-row items-center w-full gap-4 md:w-auto">
           <TableSearcher />
@@ -70,19 +82,19 @@ export default async function SubjectListPage({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="Ordenar" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModel table="subject" type="create" />}
+            {role === "admin" && <FormModel table="grade" type="create" />}
           </div>
         </div>
       </div>
 
-      {/* LIST */}
+      {/* LISTA */}
       <Table
         columns={columns}
         data={results}
-        renderRow={(subject) => <SubjectRow key={subject.id} subject={subject} />}
+        renderRow={(grade) => <GradeRow key={grade.id} grade={grade} />}
       />
 
-      {/* PAGINATION */}
+      {/* PAGINAÇÃO */}
       <Pagination currentPage={page} totalPages={totalPages} />
     </div>
   );

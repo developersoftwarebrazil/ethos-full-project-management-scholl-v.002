@@ -5,8 +5,8 @@ import FormModel from "@/components/Forms/FormModel";
 import { Subject } from "@/lib/types/subject";
 import { role } from "@/lib/data";
 
-function formatTeachers(teachers: Subject["teachers"]) {
-  return teachers
+function formatSubjects(subjects: Subject["teachers"]) {
+  return subjects
   ?.map((t) =>{
     if(typeof t === "number") return `ID: ${t}`;//Quando só temos o ID
     if(t?.user) return `${t.user.first_name} ${t.user.last_name}`;//Objeto completo
@@ -19,16 +19,16 @@ export default function SubjectRow({ subject }: { subject: Subject }) {
   return (
     <tr
       key={subject.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight "
     >
       {/* Info */}
       <td className="p-4">
-        <h3 className="font-semibold">{subject.name}</h3>
+        <h3 className="font-semibold uppercase">{subject.name}</h3>
         <p className="text-xs text-gray-500">{subject.description || "-"}</p>
       </td>
 
       <td className="hidden md:table-cell">
-        {formatTeachers(subject.teachers)}
+        {formatSubjects(subject.teachers)}
       </td>
 
       {/* Ações */}

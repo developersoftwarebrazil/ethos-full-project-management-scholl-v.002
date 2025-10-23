@@ -20,6 +20,9 @@ const SubjectForm = dynamic(() => import("./SubjectForm"), {
 const CourseForm = dynamic(() => import("./CourseForm"), {
   loading: () => <h1>Loading...</h1>,
 });
+const GradeForm = dynamic(() => import("./GradeForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
 // Mapeamento de forms
 const forms: {
   [key: string]: (props: BaseFormProps) => JSX.Element;
@@ -28,6 +31,7 @@ const forms: {
   student: (props) => <StudentForm {...props} />,
   subject: (props) => <SubjectForm {...props} />,
   course: (props) => <CourseForm {...props} />,
+  grade: (props) => <GradeForm {...props} />,
   // Adicione outros forms se necessário
 };
 
@@ -49,6 +53,7 @@ const FormModel = ({
     | "result"
     | "attendence"
     | "event"
+    | "grade" 
     | "announcement";
   type: "create" | "update" | "delete";
   data?: any;

@@ -21,7 +21,7 @@ export default function StudentRow({ student }: { student: Student }) {
           className="md:hidden xl:block w-10 h-10 rounded-full object-cover"
         />
         <div className="flex flex-col">
-          <h3 className="font-semibold">
+          <h3 className="font-semibold uppercase">
             {student.user.first_name} {student.user.last_name}
           </h3>
           <p className="text-xs text-gray-500">{student.user.email}</p>

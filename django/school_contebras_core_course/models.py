@@ -166,7 +166,6 @@ class Teacher(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
-
 class Subject(models.Model):
     name = models.CharField(max_length=150, unique=True, verbose_name="Nome da Matéria")
     description = models.TextField(
@@ -190,7 +189,6 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class Classroom(models.Model):
     name = models.CharField(max_length=100, verbose_name="Turma")
@@ -220,7 +218,6 @@ class Classroom(models.Model):
 
     def __str__(self):
         return f"Turma {self.name} - {self.course.titleCourse}"
-
 
 class Student(models.Model):
     user = models.OneToOneField(
@@ -259,7 +256,6 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
-
 class RegistrationClassroom(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -279,7 +275,6 @@ class RegistrationClassroom(models.Model):
             return False
         due_date = self.last_monthly_date + timedelta(days=30)
         return date.today() <= due_date
-
 
 class Lesson(models.Model):
     name = models.CharField(max_length=150, verbose_name="Nome da Aula")
@@ -315,7 +310,6 @@ class Lesson(models.Model):
     def __str__(self):
         return f"{self.name} - {self.subject.name}"
 
-
 class Exam(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name="Aula")
     title = models.CharField(max_length=150, verbose_name="Título da Prova")
@@ -328,7 +322,6 @@ class Exam(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class Assignment(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name="Aula")
@@ -344,7 +337,6 @@ class Assignment(models.Model):
     def __str__(self):
         return self.title
 
-
 class ExamResult(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name="Prova")
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Aluno")
@@ -358,7 +350,6 @@ class ExamResult(models.Model):
 
     def __str__(self):
         return f"{self.student.user.first_name} - {self.exam.title}"
-
 
 class AssignmentResult(models.Model):
     assignment = models.ForeignKey(
@@ -378,7 +369,6 @@ class AssignmentResult(models.Model):
     def __str__(self):
         return f"{self.student.user.first_name} - {self.assignment.title}"
 
-
 class Attendance(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, verbose_name="Aula")
     student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Aluno")
@@ -395,7 +385,6 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.student.user.first_name} - {self.lesson.name} - {self.status}"
-
 
 class Event(models.Model):
     title = models.CharField(max_length=255, verbose_name="Título do Evento")
@@ -418,7 +407,6 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class Announcement(models.Model):
     title = models.CharField(max_length=255, verbose_name="Título do Aviso")
