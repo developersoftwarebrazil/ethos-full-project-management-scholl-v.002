@@ -5,10 +5,13 @@ import { fetchSubjects } from "@/lib/api/subjects";
 import { Subject } from "@/lib/types/subject";
 
 interface GradeFormProps {
-  onClose: () => void; // função para fechar o modal
+  type: "create" | "update";
+  data?: any;
+  onSuccess?: () => void;
+  onClose?: () => void; // opcional
 }
 
-export default function GradeForm({ onClose }: GradeFormProps) {
+export default function GradeForm({ onClose, onSuccess }: GradeFormProps) {
   const [formData, setFormData] = useState({
     level: 0,
     name: "",
@@ -34,26 +37,26 @@ export default function GradeForm({ onClose }: GradeFormProps) {
   }, []);
 
   // Fecha modal ao clicar fora
-  const handleClickOutside = (e: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose();
-    }
-  };
-
   useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose?.();
+      }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [onClose]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const value =
-      e.target.type === "number"
-        ? Number(e.target.value)
-        : e.target.multiple
-        ? Array.from(e.target.selectedOptions, option => Number(option.value))
-        : e.target.value;
+    let value: string | number | number[] = e.target.value;
+
+    if (e.target.type === "number") {
+      value = Number(e.target.value);
+    } else if (e.target instanceof HTMLSelectElement && e.target.multiple) {
+      value = Array.from(e.target.selectedOptions, (option) => Number(option.value));
+    }
 
     setFormData({ ...formData, [e.target.name]: value });
   };
@@ -65,7 +68,8 @@ export default function GradeForm({ onClose }: GradeFormProps) {
     try {
       await createGrade(formData);
       alert("Série criada com sucesso!");
-      onClose(); // fecha o modal
+      onSuccess?.();
+      onClose?.();
     } catch (err: any) {
       console.error("Erro ao criar grade:", err);
       alert("Erro ao criar grade: " + JSON.stringify(err));
@@ -118,7 +122,7 @@ export default function GradeForm({ onClose }: GradeFormProps) {
           onChange={handleChange}
           className="border rounded p-2 w-full mb-4"
         >
-          {subjects.map(subject => (
+          {subjects.map((subject) => (
             <option key={subject.id} value={subject.id}>
               {subject.name}
             </option>
@@ -128,7 +132,7 @@ export default function GradeForm({ onClose }: GradeFormProps) {
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose?.()}
             className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
           >
             Cancelar
@@ -143,7 +147,6 @@ export default function GradeForm({ onClose }: GradeFormProps) {
         </div>
       </form>
 
-      {/* Tailwind CSS animation */}
       <style jsx>{`
         .animate-scale-in {
           animation: scale-in 0.2s ease-out forwards;

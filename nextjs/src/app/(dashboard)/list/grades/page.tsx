@@ -1,10 +1,12 @@
 // src/app/(dashboard)/list/grade/page.tsx
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import Table from "@/components/Lists/Table";
 import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
 import FormModel from "@/components/Forms/FormModel";
 import GradeRow from "@/components/Lists/GradeRow";
-import { Grade } from "@/lib/types/grade";
 import { role } from "@/lib/data";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
@@ -39,7 +41,7 @@ async function getGrades(page: number = 1, search: string = ""): Promise<GradeRe
     if (search) query.set("search", search);
 
     const res = await fetch(`${API_URL}/api/grades/?${query.toString()}`, {
-      next: { revalidate: 60 }, // 1 minuto
+      cache: "no-store",
     });
 
     if (!res.ok) throw new Error("Erro ao buscar séries (grades)");
