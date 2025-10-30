@@ -2,8 +2,9 @@ import Table from "@/components/Lists/Table";
 import TableSearcher from "@/components/Lists/TableSearcher";
 import Pagination from "@/components/Paginations/Pagination";
 import FormModel from "@/components/Forms/FormModel";
-import TeacherRow from "@/components/Lists/TeacherRow";
-import { Teacher } from "@/lib/types/teacher";
+import UserRow from "@/components/Lists/UserRow";
+
+import { UserData as User } from "@/lib/types";
 import { role } from "@/lib/data";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import Image from "next/image";
@@ -22,80 +23,52 @@ const columns = [
     accessor: "subjects",
     className: "hidden md:table-cell",
   },
-  {
-    headers: "Turmas",
-    accessor: "classrooms",
-    className: "hidden md:table-cell",
-  },
   { headers: "Telefone", accessor: "phone", className: "hidden lg:table-cell" },
-  {
-    headers: "Endereço",
-    accessor: "address",
-    className: "hidden md:table-cell",
-  },
-  {
-    headers: "Data de Contratação",
-    accessor: "hire_date",
-    className: "hidden md:table-cell",
-  },
+  { headers: "Endereço", accessor: "address", className: "hidden md:table-cell" },
+  { headers: "Data de Nascimento", accessor: "birthday", className: "hidden md:table-cell" },
   { headers: "Ações", accessor: "action" },
 ];
 
-type TeacherResponse = {
+type UserResponse = {
   count: number;
   next: string | null;
   previous: string | null;
-  results: Teacher[];
+  results: User[];
 };
 
-async function getTeachers(
-  page: number = 1,
-  search: string = ""
-): Promise<TeacherResponse> {
+async function getUsers(page: number = 1, search: string = ""): Promise<UserResponse> {
   try {
     const query = new URLSearchParams();
     query.set("page", page.toString());
-    if (search) query.set("search", search); // Django DRF já entende search=xxx
+    if (search) query.set("search", search);
 
-    // const res = await fetch(`${API_URL}/api/teachers/?page=${page}`, {
-    //     next: { revalidate: 60 }, // 1 minuto
-    // });
-
-    const res = await fetch(`${API_URL}/api/teachers/?${query.toString()}`, {
+    const res = await fetch(`${API_URL}/api/users/?${query.toString()}`, {
       next: { revalidate: 60 }, // 1 minuto
     });
-    if (!res.ok) throw new Error("Erro ao buscar professores");
+    if (!res.ok) throw new Error("Erro ao buscar usuários");
     return res.json();
   } catch (error) {
     console.error(error);
-    return {
-      count: 0,
-      next: null,
-      previous: null,
-      results: [],
-    };
+    return { count: 0, next: null, previous: null, results: [] };
   }
 }
 
-export default async function TeacherListPage({
+export default async function UserListPage({
   searchParams,
 }: {
-  searchParams?: { page?: string, search?: string };
+  searchParams?: { page?: string; search?: string };
 }) {
   const page = searchParams?.page ? parseInt(searchParams.page) : 1;
   const search = searchParams?.search || "";
 
-  const { results, count } = await getTeachers(page, search);
-  const totalPages = Math.ceil(count / ITEM_PER_PAGE); // se PAGE_SIZE = 10
-  // const data = await getTeachers();
+  const { results, count } = await getUsers(page, search);
+  const totalPages = Math.ceil(count / ITEM_PER_PAGE);
 
   return (
     <div className="flex-1 bg-white rounded-md p-4 m-4 mt-0">
       {/* TOP */}
       <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">
-          Todos os professores
-        </h1>
+        <h1 className="hidden md:block text-lg font-semibold">Todos os usuários</h1>
         <div className="flex flex-col md:flex-row items-center w-full gap-4 md:w-auto">
           <TableSearcher />
           <div className="flex items-center gap-4 self-end">
@@ -105,7 +78,7 @@ export default async function TeacherListPage({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="Ordenar" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModel table="teacher" type="create" />}
+            {role === "admin" && <FormModel table="user" type="create" />}
           </div>
         </div>
       </div>
@@ -114,9 +87,7 @@ export default async function TeacherListPage({
       <Table
         columns={columns}
         data={results}
-        renderRow={(teacher) => (
-          <TeacherRow key={teacher.id} teacher={teacher} />
-        )}
+        renderRow={(user) => <UserRow key={user.id} user={user} />}
       />
 
       {/* PAGINATION */}

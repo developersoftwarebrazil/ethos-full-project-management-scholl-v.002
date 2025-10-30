@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 // Dinâmico
+const UserForm = dynamic(() => import("./UserForm"), {
+  loading: () => <h1>Loading...</h1>,
+});
+
 const TeacherForm = dynamic(() => import("./TeacherForm"), {
   loading: () => <h1>Loading...</h1>,
 });
@@ -27,6 +31,7 @@ const GradeForm = dynamic(() => import("./GradeForm"), {
 const forms: {
   [key: string]: (props: BaseFormProps) => JSX.Element;
 } = {
+  user: (props) =><UserForm {...props} />,
   teacher: (props) => <TeacherForm {...props} />,
   student: (props) => <StudentForm {...props} />,
   subject: (props) => <SubjectForm {...props} />,
@@ -42,6 +47,7 @@ const FormModel = ({
   id,
 }: {
   table:
+    | "user"
     | "teacher"
     | "student"
     | "course"
