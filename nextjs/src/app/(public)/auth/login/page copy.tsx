@@ -1,33 +1,6 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../../../contexts/ AuthContext"; // ajuste o caminho conforme seu projeto
-
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router = useRouter();
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setError("");
-      await login(username, password);
-      // Redireciona após login bem-sucedido
-      // window.location.href = "/dashboard";
-         // ✅ Redireciona usando App Router
-      router.push("/admin");  
-    } catch (err: any) {
-      setError(err.message || "Erro ao logar");
-    }
-  };
-
   return (
     <section className="relative flex min-h-screen ethos-bg overflow-hidden">
       {/* LADO ESQUERDO: LOGIN */}
@@ -38,10 +11,7 @@ export default function LoginPage() {
             ETHOS
           </h2>
 
-          <form
-            className="w-full flex flex-col items-center"
-            onSubmit={handleSubmit}
-          >
+          <form className="w-full flex flex-col items-center">
             <div className="w-full mb-4 text-left">
               <label
                 htmlFor="username"
@@ -52,8 +22,6 @@ export default function LoginPage() {
               <input
                 id="username"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 className="w-full mt-1 px-3 py-2 border border-[#fb1] rounded-md text-[#003366] focus:outline-none"
               />
             </div>
@@ -68,13 +36,9 @@ export default function LoginPage() {
               <input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 className="w-full mt-1 px-3 py-2 border border-[#fb1] rounded-md text-[#003366] focus:outline-none"
               />
             </div>
-
-            {error && <p className="text-red-500 mb-2">{error}</p>}
 
             <button
               type="submit"
@@ -115,9 +79,9 @@ export default function LoginPage() {
           <h3 className="text-2xl font-bold mt-2">Apresenta</h3>
 
           <div className="flex gap-4 justify-center my-6">
-            {["C", "P", "A", "C"].map((letra, index) => (
+            {["C", "P", "A", "C"].map((letra) => (
               <span
-                key={`${letra}-${index}`}
+                key={letra}
                 className="cpac-circle flex items-center justify-center w-20 h-20 rounded-full text-5xl font-chathura"
               >
                 {letra}
@@ -131,6 +95,7 @@ export default function LoginPage() {
 
           <blockquote className="relative flex flex-col items-center justify-center text-[#011f53] font-semibold text-3xl italic leading-tight text-center mt-6 mb-4 space-y-2">
             <div className="relative flex items-center justify-center">
+              {/* Aspa esquerda */}
               <Image
                 src="/svgs/aspas-left.svg"
                 alt="Aspa esquerda"
@@ -143,6 +108,7 @@ export default function LoginPage() {
 
             <div className="relative flex items-center justify-center">
               <p>novas dimensões</p>
+              {/* Aspa direita */}
               <Image
                 src="/svgs/aspas-right.svg"
                 alt="Aspa direita"

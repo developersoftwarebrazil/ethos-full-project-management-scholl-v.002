@@ -1,0 +1,8 @@
+# Clerk (auth)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_cmVhbC1mbGFtaW5nby04MS5jbGVyay5hY2NvdW50cy5kZXY
+CLERK_SECRET_KEY=sk_test_i3yz5mdqeHpxniglos09BltrDfaUkULPZFpGWDWkxm
+
+NEXT_PUBLIC_API_URL=http://django:8000
+
+# Banco de dados PostgreSQL (Docker)
+DATABASE_URL=postgresql://postgres:root@localhost:5432/django_videos
