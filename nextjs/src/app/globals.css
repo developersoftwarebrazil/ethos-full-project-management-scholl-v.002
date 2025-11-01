@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Chathura:wght@400;700&family=Inter:wght@400;600;700&display=swap");
+
 .react-calendar {
   width: 100% !important;
   border: none !important;
@@ -102,7 +104,49 @@
   background-color: #fdf2fb !important;
 }
 
-.rbc-event-label{
+.rbc-event-label {
   color: gray !important;
   margin-bottom: 5px;
 }
+/* === ETHOS LOGIN PAGE CUSTOM === */
+@import url("https://fonts.googleapis.com/css2?family=Chathura:wght@400;700&family=Inter:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;700&display=swap");
+
+body {
+  font-family: "Inter", sans-serif;
+}
+
+/* Ajustes específicos da tela de login */
+.ethos-bg {
+  background: url("/imgs/foto-estante-livros.jpg") no-repeat center center;
+  background-size: cover;
+}
+
+.ethos-presenter {
+  background: url("/imgs/foto-apresentador.png") no-repeat bottom right;
+  background-size: contain;
+}
+
+.welcome-box {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.welcome-box-content {
+  background-color: #003366;
+  border: 0.25rem solid #fb1;
+  border-radius: 20% 0;
+  color: #fcffff;
+}
+
+.cpac-circle {
+  background-color: #003366;
+  color: #fcffff;
+  border: 1px solid #fb1;
+}
+/* .cote-left {
+  background: url("/svgs/aspas-left.svg") no-repeat top left;
+  background-size: contain;
+}
+.cote-right {
+  background: url("/svgs/aspas-right.svg") no-repeat bottom right;
+  background-size: contain;
+} */
